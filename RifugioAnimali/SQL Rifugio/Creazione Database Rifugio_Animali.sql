@@ -63,7 +63,7 @@ create table animale
     vaccinato bool not null,
     adottato bool not null,
     specie_id int,
-    diario_id int,
+    diario_id int unique,
     foreign key (specie_id) references specie (specie_id),
     foreign key (diario_id) references diario_clinico (diario_id)
 );
