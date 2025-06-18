@@ -30,14 +30,14 @@ create table staff
 (
 	staff_id int primary key auto_increment,
     is_admin bool not null,
-    utente_id int,
+    utente_id int unique,
     foreign key (utente_id) references utente (utente_id)
 );
 
 create table cliente
 (
 	cliente_id int primary key auto_increment,
-    utente_id int,
+    utente_id int unique,
     foreign key (utente_id) references utente (utente_id)
 );
 
