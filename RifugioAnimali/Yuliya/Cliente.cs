@@ -181,7 +181,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
                         {
-                            Console.WriteLine("Nome modificato con successo");
+                            Console.WriteLine("Cognome modificato con successo");
                         }
                         else
                         {
@@ -195,16 +195,16 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string email = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(email))
                 {
-                    string query = "UPDATE utente SET cognome = @cognome WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET email = @email WHERE cliente_id = @ClienteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
-                        cmd.Parameters.AddWithValue("@cognome", email);
+                        cmd.Parameters.AddWithValue("@email", email);
                         cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
                         {
-                            Console.WriteLine("Nome modificato con successo");
+                            Console.WriteLine("Email modificata con successo");
                         }
                         else
                         {
@@ -218,16 +218,85 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string password = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(password))
                 {
-                    string query = "UPDATE utente SET cognome = @cognome WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET password = @password WHERE cliente_id = @ClienteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
-                        cmd.Parameters.AddWithValue("@cognome", password);
+                        cmd.Parameters.AddWithValue("@password", password);
                         cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
                         {
-                            Console.WriteLine("Nome modificato con successo");
+                            Console.WriteLine("Password modificata con successo");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Modifica non riuscita");
+                        }
+                    }
+                }
+                break;
+            case "5":
+                Console.WriteLine("Inserisci il nuovo telefono");
+                string telefono = Console.ReadLine().Trim().ToLower();
+                if (!string.IsNullOrEmpty(telefono))
+                {
+                    string query = "UPDATE utente SET telefono = @telefono WHERE cliente_id = @ClienteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    {
+                        cmd.Parameters.AddWithValue("@telefono", telefono);
+                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+
+                        int rows = cmd.ExecuteNonQuery();
+                        if (rows > 0)
+                        {
+                            Console.WriteLine("Password modificata con successo");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Modifica non riuscita");
+                        }
+                    }
+                }
+                break;
+            case "6":
+                Console.WriteLine("Inserisci il nuovo indirizzo");
+                string indirizzo = Console.ReadLine().Trim().ToLower();
+                if (!string.IsNullOrEmpty(indirizzo))
+                {
+                    string query = "UPDATE utente SET indirizzo = @indirizzo WHERE cliente_id = @ClienteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    {
+                        cmd.Parameters.AddWithValue("@indirizzo", indirizzo);
+                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+
+                        int rows = cmd.ExecuteNonQuery();
+                        if (rows > 0)
+                        {
+                            Console.WriteLine("Indirizzo modificato con successo");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Modifica non riuscita");
+                        }
+                    }
+                }
+                break;
+                    case "7":
+                Console.WriteLine("Inserisci la nuova città");
+                string citta = Console.ReadLine().Trim().ToLower();
+                if (!string.IsNullOrEmpty(citta))
+                {
+                    string query = "UPDATE utente SET citta = @citta WHERE cliente_id = @ClienteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    {
+                        cmd.Parameters.AddWithValue("@citta", citta);
+                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+
+                        int rows = cmd.ExecuteNonQuery();
+                        if (rows > 0)
+                        {
+                            Console.WriteLine("Città modificata con successo");
                         }
                         else
                         {
