@@ -3,6 +3,9 @@ using MySql.Data.MySqlClient;
 
 public class Responsabile : Staff
 {
+    public Responsabile(int staffID) : base(staffID)
+    { }
+
     public void AggiungiSpecie(MySqlConnection connection)
     {
         Console.WriteLine("--------------------------------------------------");

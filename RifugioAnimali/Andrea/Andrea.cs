@@ -1,8 +1,6 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
 
-public abstract class Utente { }
-
 public class Staff : Utente
 {
     private int _staffID;
