@@ -17,7 +17,7 @@ public abstract class Utente
                 throw new ArgumentException("ID utente non valido. Deve essere maggiore di zero.");
             }
 
-            Id = utenteId;
+            UtenteId = utenteId;
         }
 
     // Metodo per la registrazione
