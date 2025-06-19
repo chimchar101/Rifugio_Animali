@@ -23,7 +23,7 @@ public class Staff : Utente
         accessorio
     }
 
-    private int SelectSpecieID(MySqlConnection connection)
+    private int SelectSpecieID(MySqlConnection connection) // stampa la lista di specie e fa selezionare l'id all'utente
     {
         string sql = @"select specie_id, specie from specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
@@ -39,7 +39,7 @@ public class Staff : Utente
         return specieID;
     }
 
-    public void StampaAnimali(MySqlConnection connection)
+    public void StampaAnimali(MySqlConnection connection) // stampa la lista degli animali
     {
         string sql = @"select a.animale_id, s.specie, a.nome, a.eta, a.vaccinato, a.adottato 
                     from animale a join specie s on s.specie_id = a.specie_id;";
@@ -53,18 +53,18 @@ public class Staff : Utente
         rdr.Close();
     }
 
-    public void AffidaAnimale(MySqlConnection connection)
+    public void AffidaAnimale(MySqlConnection connection) // da in adozione un animale ad un cliente
     {
         try
         {
-            int specieID = SelectSpecieID(connection);
+            int specieID = SelectSpecieID(connection); // seleziona specieID
 
             string sql = @"select a.animale_id, s.specie, a.nome, a.eta, a.vaccinato
             from animale a join specie s on s.specie_id = a.specie_id
             where specie_id = @specie_id and adottato = false";
             MySqlCommand cmd = new MySqlCommand(sql, connection);
             cmd.Parameters.AddWithValue("@specie_id", specieID);
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();  // seleiona lista animali non adottati della specie selezionata
 
             if (!rdr.Read())
             {
@@ -97,7 +97,7 @@ public class Staff : Utente
             cmd = new MySqlCommand(sql, connection);
             cmd.Parameters.AddWithValue("@nome", nomeCliente);
             cmd.Parameters.AddWithValue("@cognome", cognomeCliente);
-            rdr = cmd.ExecuteReader();
+            rdr = cmd.ExecuteReader();  // seleziona utenti tramite nome e cognome  
 
             if (!rdr.Read())
             {
@@ -133,12 +133,12 @@ public class Staff : Utente
             cmd.Parameters.AddWithValue("@animale_id", animaleID);
             cmd.Parameters.AddWithValue("@cliente_id", clienteID);
             cmd.Parameters.AddWithValue("@staff_id", StaffID);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  // aggiunge l'animale nella tabella adozione
 
             sql = @"update animale set adottato = true where animale_id = @animale_id";
             cmd = new MySqlCommand(sql, connection);
             cmd.Parameters.AddWithValue("@animale_id", animaleID);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  // imposta a true il valore "adottato" dell'animale
 
             Console.WriteLine("Animale affidato con successo.");
         }
@@ -157,7 +157,7 @@ public class Staff : Utente
             string sql = @"insert into diario_clinico(numero_visite, ultima_visita, prossimo_richiamo)
             values (0, null, null)";
             MySqlCommand cmd = new MySqlCommand(sql, connection);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  //crea un nuovo diario clinico vuoto
 
             Console.Write("Inserisci nome: ");
             string nomeAnimale = Console.ReadLine() ?? "Campo obbligatorio";
@@ -188,7 +188,7 @@ public class Staff : Utente
             cmd.Parameters.AddWithValue("@adottato", isAdottato);
             cmd.Parameters.AddWithValue("@specie_id", specieID);
             cmd.Parameters.AddWithValue("@diario_id", diarioID);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  // aggiunge l'animale alla tabella animale
 
             Console.Write("Usare la data di oggi? (true/false): ");
             bool useCurrDate = bool.Parse(Console.ReadLine() ?? "Campo obbligatorio");
@@ -213,7 +213,7 @@ public class Staff : Utente
 
             cmd.Parameters.AddWithValue("@animale_id", animaleID);
             cmd.Parameters.AddWithValue("@staff_id", StaffID);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  // aggiunge i dati di ingresso nella tabella ingresso
 
             Console.WriteLine("Animale aggiunto con successo.");
         }
@@ -229,7 +229,7 @@ public class Staff : Utente
                     from adozione ad join animale a on ad.animale_id = a.animale_id join
                     join cliente c on ad.cliente_id = c.cliente_id join staff s on ad.staff_id = s.staff_id;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
-        MySqlDataReader rdr = cmd.ExecuteReader();
+        MySqlDataReader rdr = cmd.ExecuteReader();  // seleziona lista adozioni
         Console.WriteLine("id -- data -- nome animale -- nome cliente -- nome staff");
         while (rdr.Read())
         {
@@ -272,7 +272,7 @@ public class Staff : Utente
         }
     }
 
-    private int SelectOrAddCategoriaID(MySqlConnection connection, string categoria)
+    private int SelectOrAddCategoriaID(MySqlConnection connection, string categoria) // fa selezionare una categoria di oggetto in inventario o ne aggiunge una
     {
         string sql = @"select categoria_id, nome, descrizione from @categoria;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
@@ -301,7 +301,7 @@ public class Staff : Utente
             cmd.Parameters.AddWithValue("@nome", nomeCategoria);
             cmd.Parameters.AddWithValue("@descrizione", descrizioneCategoria);
             cmd.Parameters.AddWithValue("@categoria", categoria);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();  // aggiunge la nuova categoria
 
             sql = @"select max(categoria_id) from @categoria";
             cmd = new MySqlCommand(sql, connection);
@@ -314,15 +314,8 @@ public class Staff : Utente
         return categoriaID;
     }
 
-    private int AddInventarioID(MySqlConnection connection, bool scade)
+    private int AddInventarioID(MySqlConnection connection, DateTime? scadenza) // aggiunge un nuovo elemento in inventario e ritorna l'id
     {
-        DateTime? scadenza = null;
-        if (scade)
-        {
-            Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
-            scadenza = DateTime.Parse(Console.ReadLine() ?? "Campo obbligatorio");
-        }
-
         string sql = @"insert into inventario(scadenza)
                     values (@scadenza)";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
@@ -339,28 +332,36 @@ public class Staff : Utente
         return inventarioID;
     }
 
-    private void AggiungiCibo(MySqlConnection connection)
+    private void AggiungiCibo(MySqlConnection connection) // aggiunge cibo nella tabella cibo e inventario
     {
         try
         {
-            int categoriaID = SelectOrAddCategoriaID(connection, InvType.cibo.ToString());
+            int categoriaID = SelectOrAddCategoriaID(connection, InvType.cibo.ToString()); // seleziona categoriaID
 
             Console.Write("Inserisci nome: ");
             string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
             nomeCibo = nomeCibo.ToLower().Trim();
 
-            int inventarioID = AddInventarioID(connection, true);
+            Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
+            DateTime scadenza = DateTime.Parse(Console.ReadLine() ?? "Campo obbligatorio");
 
-            int specieID = SelectSpecieID(connection);
+            int specieID = SelectSpecieID(connection);  // seleziona specieID
 
-            string sql = @"insert into cibo(nome, categoria_id, inventario_id, specie_id)
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+            
+            for (int i = 0; i < amount; i++)    // aggiunge la quantità desiderata
+            {
+                int inventarioID = AddInventarioID(connection, scadenza);
+                string sql = @"insert into cibo(nome, categoria_id, inventario_id, specie_id)
                 values (@nome, @categoria_id, @inventario_id, @specie_id)";
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@nome", nomeCibo);
-            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
-            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
-            cmd.Parameters.AddWithValue("@specie_id", specieID);
-            cmd.ExecuteNonQuery();
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@nome", nomeCibo);
+                cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+                cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+                cmd.Parameters.AddWithValue("@specie_id", specieID);
+                cmd.ExecuteNonQuery();
+            }
 
             Console.WriteLine("Cibo aggiunto con successo");
         }
@@ -380,18 +381,26 @@ public class Staff : Utente
             string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
             nomeCibo = nomeCibo.ToLower().Trim();
 
-            int inventarioID = AddInventarioID(connection, true);
+            Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
+            DateTime scadenza = DateTime.Parse(Console.ReadLine() ?? "Campo obbligatorio");
 
             int specieID = SelectSpecieID(connection);
 
-            string sql = @"insert into medicina(nome, categoria_id, inventario_id, specie_id)
-                values (@nome, @categoria_id, @inventario_id, @specie_id)";
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@nome", nomeCibo);
-            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
-            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
-            cmd.Parameters.AddWithValue("@specie_id", specieID);
-            cmd.ExecuteNonQuery();
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+            for (int i = 0; i < amount; i++)
+            {
+                int inventarioID = AddInventarioID(connection, scadenza);
+                string sql = @"insert into medicina(nome, categoria_id, inventario_id, specie_id)
+                    values (@nome, @categoria_id, @inventario_id, @specie_id)";
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@nome", nomeCibo);
+                cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+                cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+                cmd.Parameters.AddWithValue("@specie_id", specieID);
+                cmd.ExecuteNonQuery();
+            }
 
             Console.WriteLine("Medicina aggiunta con successo");
         }
@@ -415,19 +424,24 @@ public class Staff : Utente
             string taglia = Console.ReadLine() ?? "Campo obbligatorio";
             taglia = taglia.ToLower().Trim();
 
-            int inventarioID = AddInventarioID(connection, false);
-
             int specieID = SelectSpecieID(connection);
 
-            string sql = @"insert into cibo(nome, taglia, categoria_id, inventario_id, specie_id)
-                values (@nome, @taglia, @categoria_id, @inventario_id, @specie_id)";
-            MySqlCommand cmd = new MySqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@nome", nomeCibo);
-            cmd.Parameters.AddWithValue("@taglia", taglia);
-            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
-            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
-            cmd.Parameters.AddWithValue("@specie_id", specieID);
-            cmd.ExecuteNonQuery();
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+            for (int i = 0; i < amount; i++)
+            {
+                int inventarioID = AddInventarioID(connection, null);
+                string sql = @"insert into cibo(nome, taglia, categoria_id, inventario_id, specie_id)
+                    values (@nome, @taglia, @categoria_id, @inventario_id, @specie_id)";
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("@nome", nomeCibo);
+                cmd.Parameters.AddWithValue("@taglia", taglia);
+                cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+                cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+                cmd.Parameters.AddWithValue("@specie_id", specieID);
+                cmd.ExecuteNonQuery();
+            }
 
             Console.WriteLine("Accessorio aggiunto con successo");
         }
@@ -437,7 +451,7 @@ public class Staff : Utente
         }
     }
 
-    public void RimuoviInventario(MySqlConnection connection)
+    public void RimuoviInventario(MySqlConnection connection) // rimuove un elemento da inventario
     {
         bool exit = false;
 
@@ -471,7 +485,7 @@ public class Staff : Utente
         }
     }
 
-    private int SelectInventarioID(MySqlConnection connection, string tipo)
+    private int SelectInventarioID(MySqlConnection connection, string tipo) // seleziona inventarioID
     {
         string sql = @"select i.inventario_id, t.nome i.scadenza from inventario i
                     join @tipo t on i.inventario_id = t.inventario_id;";
@@ -489,7 +503,7 @@ public class Staff : Utente
         return inventarioID;
     }
 
-    private void RimuoviCibo(MySqlConnection connection)
+    private void RimuoviCibo(MySqlConnection connection) // rimuove un elemento da inventario e cibo
     {
         int inventarioID = SelectInventarioID(connection, InvType.cibo.ToString());
 
@@ -506,7 +520,7 @@ public class Staff : Utente
         Console.WriteLine("Cibo rimosso con successo");
     }
 
-    private void RimuoviMedicina(MySqlConnection connection)
+    private void RimuoviMedicina(MySqlConnection connection)    // rimuove un elemento da inventario e medicina
     {
         int inventarioID = SelectInventarioID(connection, InvType.medicina.ToString());
 
@@ -523,7 +537,7 @@ public class Staff : Utente
         Console.WriteLine("Medicina rimossa con successo");
     }
 
-    private void RimuoviAccessorio(MySqlConnection connection)
+    private void RimuoviAccessorio(MySqlConnection connection)  // rimuove un elemento da inventario e accessorio
     {
         int inventarioID = SelectInventarioID(connection, InvType.accessorio.ToString());
 
@@ -540,7 +554,7 @@ public class Staff : Utente
         Console.WriteLine("Accessorio rimosso con successo");
     }
 
-    public void StampaInventario(MySqlConnection connection)
+    public void StampaInventario(MySqlConnection connection) // stampa l'inventario del tipo selezionato
     {
         bool exit = false;
 
@@ -574,11 +588,12 @@ public class Staff : Utente
         }
     }
 
-    private void StampaCibo(MySqlConnection connection)
+    private void StampaCibo(MySqlConnection connection) // stampa il cibo con la quantità
     {
         string sql = @"select count(c.inventario_id) as quantita, c.nome, ca.nome, s.specie
                     from cibo c join categoria_cibo ca on c.categoria_id = ca.categoria_id
-                    join specie s on c.specie_id = s.specie_id;";
+                    join specie s on c.specie_id = s.specie_id
+                    group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
         Console.WriteLine("quantità -- nome -- categoria -- specie");
@@ -589,11 +604,12 @@ public class Staff : Utente
         rdr.Close();
     }
 
-    private void StampaMedicina(MySqlConnection connection)
+    private void StampaMedicina(MySqlConnection connection) // stampa le medicine con la quantità
     {
         string sql = @"select count(m.inventario_id) as quantita, m.nome, ca.nome, s.specie
                     from medicina m join categoria_medicina ca on m.categoria_id = ca.categoria_id
-                    join specie s on c.specie_id = s.specie_id;";
+                    join specie s on c.specie_id = s.specie_id
+                    group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
         Console.WriteLine("quantità -- nome -- categoria -- specie");
@@ -604,11 +620,12 @@ public class Staff : Utente
         rdr.Close();
     }
 
-    private void StampaAccessorio(MySqlConnection connection)
+    private void StampaAccessorio(MySqlConnection connection)   // stampa gli accessori con la quantità
     {
         string sql = @"select count(a.inventario_id) as quantita, a.nome, ca.nome, a.taglia, s.specie
                     from accessorio a join categoria_accessorio ca on a.categoria_id = ca.categoria_id
-                    join specie s on c.specie_id = s.specie_id;";
+                    join specie s on c.specie_id = s.specie_id
+                    group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
         Console.WriteLine("quantità -- nome -- categoria -- taglia -- specie");
