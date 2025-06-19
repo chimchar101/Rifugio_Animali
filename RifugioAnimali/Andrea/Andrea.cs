@@ -9,7 +9,7 @@ public class Staff : Utente
         get { return _staffID; }
     }
 
-    public Staff(int staffID)
+    public Staff(int staffID) : base(staffID)
     {
         _staffID = staffID;
     }
