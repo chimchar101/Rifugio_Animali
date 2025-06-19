@@ -4,13 +4,31 @@ using MySql.Data.MySqlClient;
 
 public class Cliente : Utente // Classe Cliente che estende la classe Utente
 {
-    public Cliente(int utenteId) // Costruttore della classe Cliente
-        : base(utenteId)
+    private int _utenteId;
+    public int UtenteId
     {
-
+        get { return _utenteId; }
     }
 
-    public static void Registrazione(MySqlConnection connessione) // metodo per la registrazione dell'utente
+    private int _clienteId;
+    public int ClienteId
+    {
+        get { return _clienteId; }
+    }
+    public Cliente(int utenteId, MySqlConnection connection) : base(utenteId)
+    {
+        _utenteId = utenteId;
+
+        string sql = "select cliente_id from cliente where utente_id = @utente_id";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@utente_id", utenteId);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        rdr.Read();
+        _clienteId = (int)rdr[0];
+        rdr.Close();
+    }
+
+    /*public static void Registrazione(MySqlConnection connessione) // metodo per la registrazione dell'utente
     {
         while (true) // Ciclo per richiedere i dati fino a quando non sono validi
         {
@@ -157,12 +175,12 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
 
             break; // Esce dal ciclo
         }
-    }
+    } */
 
     public void StampaAnimali(MySqlConnection connessione) // Metodo per stampare gli animali disponibili per l'adozione
     {
         string query = "SELECT * FROM animale join specie on specie.specie_id=animale.specie_id WHERE adottato = false "; // Solo animali non adottati
-        using (MySqlCommand cmd = new MySqlCommand(query,connessione))
+        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
         {
             using (MySqlDataReader reader = cmd.ExecuteReader())
             {
@@ -184,9 +202,9 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
     public void StampaAdozioni(MySqlConnection connessione) // Metodo per stampare le adozioni effettuate dal cliente
     {
         string query = "SELECT * FROM adozione WHERE cliente_id = @ClienteID";
-        using (MySqlCommand cmd = new MySqlCommand(query,connessione))
+        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
         {
-            cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+            cmd.Parameters.AddWithValue("@ClienteID", ClienteId);
             using (MySqlDataReader reader = cmd.ExecuteReader())
             {
                 if (reader.HasRows) // Controlla se ci sono adozioni effettuate dal cliente
@@ -204,7 +222,8 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             }
         }
     }
-    public void ModificaProfilo(MySqlConnection connessione)
+
+    /* public void ModificaProfilo(MySqlConnection connessione)
     {
         Console.WriteLine("Modifica il tuo profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Email\n 4. Password\n 5. Telefono\n 6. Indirizzo\n 7. Città\n 8. Esci");
@@ -216,11 +235,11 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string nome = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(nome))
                 {
-                    string query = "UPDATE utente SET nome = @nome WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET nome = @nome WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@nome", nome);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
@@ -239,11 +258,11 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string cognome = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(cognome))
                 {
-                    string query = "UPDATE utente SET cognome = @cognome WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET cognome = @cognome WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@cognome", cognome);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
@@ -262,14 +281,19 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string email = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(email))
                 {
-                    string query = "UPDATE utente SET email = @email WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET email = @email WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@email", email);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
-                        int rows = cmd.ExecuteNonQuery();
-                        if (rows > 0 && IsEmailValid(email, connessione))
+                        int rows = 0;
+                        if (IsTelefonoValid(email, connessione))
+                        {
+                            rows = cmd.ExecuteNonQuery();
+                        }
+
+                        if (rows > 0)
                         {
                             Console.WriteLine("Email modificata con successo");
                         }
@@ -285,14 +309,19 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string password = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(password))
                 {
-                    string query = "UPDATE utente SET password = @password WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET password = @password WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@password", password);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
-                        int rows = cmd.ExecuteNonQuery();
-                        if (rows > 0 && IsPasswordValid(password, connessione ))
+                        int rows = 0;
+                        if (IsTelefonoValid(password, connessione))
+                        {
+                            rows = cmd.ExecuteNonQuery();
+                        }
+
+                        if (rows > 0)
                         {
                             Console.WriteLine("Password modificata con successo");
                         }
@@ -308,16 +337,21 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string telefono = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(telefono))
                 {
-                    string query = "UPDATE utente SET telefono = @telefono WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE utente SET telefono = @telefono WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@telefono", telefono);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
-                        int rows = cmd.ExecuteNonQuery();
-                        if (rows > 0 && IsTelefonoValid(telefono, connessione))
+                        int rows = 0;
+                        if (IsTelefonoValid(telefono, connessione))
                         {
-                            Console.WriteLine("Password modificata con successo");
+                            rows = cmd.ExecuteNonQuery();
+                        }
+
+                        if (rows > 0)
+                        {
+                            Console.WriteLine("Telefono modificato con successo");
                         }
                         else
                         {
@@ -326,16 +360,16 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                     }
                 }
                 break;
-            /*case "6":
+            case "6":
                 Console.WriteLine("Inserisci il nuovo indirizzo");
                 string indirizzo = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(indirizzo))
                 {
-                    string query = "UPDATE indirizzo SET indirizzo = @indirizzo JOIN utente ON utente.indirizzo_id = indirizzo.indirizzo_id WHERE cliente_id = @ClienteID";
+                    string query = "UPDATE indirizzo JOIN utente ON utente.indirizzo_id = indirizzo.indirizzo_id SET indirizzo = @indirizzo WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@indirizzo", indirizzo);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
@@ -354,11 +388,12 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 string citta = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(citta))
                 {
-                    string query = "UPDATE citta SET citta = @citta JOIN indirizzo ON citta.citta_id = indirizzo.citta_id WHERE cliente_id = @ClienteID";
+                    string query = @"UPDATE citta JOIN indirizzo ON citta.citta_id = indirizzo.citta_id JOIN utente on utente.indirizzo_id = indirizzo.indirizzo_idSET citta = @citta 
+                                    WHERE utente_id = @UtenteID";
                     using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@citta", citta);
-                        cmd.Parameters.AddWithValue("@ClienteID", this.UtenteId);
+                        cmd.Parameters.AddWithValue("@UtenteID", this.UtenteId);
 
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)
@@ -371,20 +406,36 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                         }
                     }
                 }
-                break; */
+                break;
+            default:
+                Console.WriteLine("Opzione non valida");
+                break;
+            
 
 
         }
-    }
-
-    public void VisualizzaDiarioClinico(MySqlConnection connessione, int animaleId)
+    }*/
+    public void VisualizzaDiarioClinico(MySqlConnection connessione)
     {
-        string query = @"SELECT animale.id, animale.nome, animale.vaccinato, diario_clinico.numero_visite, diario_clinico.ultima_visita, diario_clinico.prossimo_richiamo AS storico
+        string sql = @"select animale_id, nome, eta from animale;";
+        MySqlCommand cmd = new MySqlCommand(sql, connessione);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("id -- nome -- età");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+        }
+        rdr.Close();
+        Console.Write("Seleziona ID animale: ");
+        int animaleId = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+
+        string query = @"SELECT animale.animale_id, animale.nome, animale.vaccinato, diario_clinico.numero_visite, diario_clinico.ultima_visita, diario_clinico.prossimo_richiamo
         FROM animale
-        JOIN diario_clinico ON diario_clinico.animale_id = animale.animale_id
+        JOIN diario_clinico ON diario_clinico.diario_id = animale.diario_id
         WHERE animale_id = @animaleId";
 
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        using (cmd = new MySqlCommand(query, connessione))
         {
             cmd.Parameters.AddWithValue("@animaleId", animaleId);
 
@@ -408,7 +459,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         }
     }
 
-
+/*
     public static bool IsEmailValid(string email, MySqlConnection connessione) // Metodo per verificare se l'email è già registrata nel database
     {
         string query = "SELECT email FROM utente WHERE email = @Email"; // Query per verificare se l'email esiste già
@@ -461,4 +512,5 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         }
         return true;
     }
+*/
 }
