@@ -23,9 +23,6 @@ public abstract class Utente
         Telefono = telefono;
     }
 
-    // Metodo astratto per il login, da implementare nelle sottoclassi
-    public abstract bool Login(string email, string password);
-
     // Metodo per la registrazione
     public static void Login(MySqlConnection conn)  
     {
