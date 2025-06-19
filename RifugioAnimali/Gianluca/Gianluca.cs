@@ -10,18 +10,15 @@ public abstract class Utente
     public int UtenteId { get; set; }  // ID dell'utente
 
     // Costruttore per inizializzare un utente
-    public Utente(int UtenteId)
-    {
-        if (int.TryParse(UtenteId, out int id))
+        public Utente(int utenteId)
         {
-            UtenteId = id;  // Imposta l'ID dell'utente se è valido
-        }
-        else
-        {
-            throw new ArgumentException("ID utente non valido.");
-        }
-    }
+            if (utenteId <= 0)
+            {
+                throw new ArgumentException("ID utente non valido. Deve essere maggiore di zero.");
+            }
 
+            Id = utenteId;
+        }
 
     // Metodo per la registrazione
     public static void Login(MySqlConnection conn)  
