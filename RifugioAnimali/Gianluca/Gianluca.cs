@@ -6,13 +6,14 @@ using MySql.Data.MySqlClient;
 
 public abstract class Utente
 {
-    //public string Utente_id { get; set; }
+    // Proprietà base comuni a tutti gli utenti
     public string Nome { get; set; }
     public string Cognome { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
     public string Telefono { get; set; }
 
+    // Costruttore per inizializzare un utente
     public Utente(string nome, string cognome, string email, string password, string telefono)
     {
         Nome = nome;
@@ -22,121 +23,49 @@ public abstract class Utente
         Telefono = telefono;
     }
 
+    // Metodo astratto per il login, da implementare nelle sottoclassi
     public abstract bool Login(string email, string password);
 
-}
-
-public class Program
-{
-    public static void Main(string[] args)
+    // Metodo per la registrazione
+    public static void Login(MySqlConnection conn)  
     {
+        int? LoggedUserId = null;    // Variabile per memorizzare l'ID dell'utente loggato
 
-        string connStr = "server=localhost; user =root; password=1234; port=3306; database=rifugio_animali;";
-        MySqlConnection conn = new MySqlConnection(connStr);
-
-        try
-        {
-            conn.Open();
-            Console.WriteLine("Connessione riuscita!");
-
-            bool esci = false;
-
-            while (!esci)
-            {
-                Console.WriteLine("Benvenuto nel nostro rifuggio animali: ");
-                Console.Write("Scegli un'opzione: ");
-                Console.Write("[1]: Registrati");
-                Console.Write("[2]: Accedi");
-                Console.Write("[3]: Esci");
-                string scelta = Console.ReadLine() ?? "Campo Obligatorio";
-
-                switch (scelta)
-                {
-                    case "1":
-                        Registrazione(conn);
-                        break;
-                    case "2":
-                        Login(conn);
-                        break;
-                    case "3":
-                        esci = true;
-                        break;
-                    default:
-                        Console.WriteLine("Opzione non valida.");
-                        break;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Errore: " + ex.Message);
-        }
-    }
-
-    private static void Registrazione(MySqlConnection conn)
-    {
-        Console.Write("Inserisci il tuo nome: ");
-        string nome = Console.ReadLine() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci il tuo cognome: ");
-        string cognome = Console.ReadLine() ?? "Campo oblogatorio";
-
+        // Verifica se l'email è valida
         Console.Write("Inserisci la tua email: ");
-        string email = Console.ReadLine() ?? "Campo oblogatorio";
+        string email = Console.ReadLine()?.Trim();
+        if (string.IsNullOrEmpty(email))
+        {
+            Console.WriteLine("Email obbligatoria.");
+            return;
+        }
 
+        // Verifica se la password è valida
         Console.Write("Inserisci la tua password: ");
-        string password = Console.ReadLine() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci il tuo telefono: ");
-        string telefono = Console.ReadLine() ?? "Campo oblogatorio";
-
-        string query = "INSERT INTO utenti (nome, cognome, email, password, telefono) VALUES (@nome, @cognome, @email, @password, @telefono)";
+        string password = Console.ReadLine()?.Trim();
+        if (string.IsNullOrEmpty(password))
+        {
+            Console.WriteLine("Password obbligatoria.");
+            return;
+        }
+        
+        // Query per verificare le credenziali dell'utente
+        string query = "SELECT * FROM utente WHERE email = @Email AND password = @Password";
         using MySqlCommand cmd = new MySqlCommand(query, conn);
 
-        cmd.Parameters.AddWithValue("@nome", nome);
-        cmd.Parameters.AddWithValue("@cognome", cognome);
-        cmd.Parameters.AddWithValue("@email", email);
-        cmd.Parameters.AddWithValue("@password", password);
-        cmd.Parameters.AddWithValue("@telefono", telefono);
-
-        try
-        {
-            int row = cmd.ExecuteNonQuery();
-            if (row > 0)
-            {
-                Console.WriteLine("Registrazione avvenuta con successo!");
-            }
-            else
-            {
-                Console.WriteLine("Registrazione fallita.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Errore durante la registrazione: " + ex.Message);
-        }
-
-    }
-    public static void Login(MySqlConnection conn)
-    {
-        Console.Write("Inserisci la tua email: ");
-        string email = Console.ReadLine() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci la tua password: ");
-        string password = Console.ReadLine() ?? "Campo oblogatorio";
-
-        string query = "SELECT * FROM utenti WHERE email = @Email AND password = @Password";
-        using MySqlCommand cmd = new MySqlCommand(query, conn);
-
+        // Aggiunta dei parametri alla query per prevenire SQL injection
         cmd.Parameters.AddWithValue("@Email", email);
         cmd.Parameters.AddWithValue("@Password", password);
 
         try
         {
+            // Esecuzione della query e lettura dei risultati
             using MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
+                LoggedUserId = Convert.ToInt32(reader["id"]);   // Recupero dell'ID dell'utente loggato
                 Console.WriteLine("Accesso riuscito! Benvenuto " + reader["nome"]);
+
             }
             else
             {
@@ -150,43 +79,171 @@ public class Program
     }
 
 }
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // Stringa di connessione al database MySQL locale
+        string connStr = "server=localhost; user=root; password=1234; port=3306; database=rifugio_animali;";
+        using MySqlConnection conn = new MySqlConnection(connStr);
 
-
-
-
-
-
-
-/*
-    registrazione:
-
-            // controllo input
-        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+        try
         {
-            Console.WriteLine("Email non valida.");
-            return;
+            // Apertura connessione
+            conn.Open();
+            Console.WriteLine("Connessione riuscita!");
+
+            // Variabile per controllare l'uscita dal ciclo
+            bool esci = false;
+
+            // Ciclo principale del programma
+            // che permette all'utente di registrarsi, accedere o uscire
+            while (!esci)
+            {
+                Console.WriteLine("Benvenuto nel nostro rifuggio animali: ");
+                Console.WriteLine("Scegli un'opzione: ");
+                Console.WriteLine("[1]: Registrati");
+                Console.WriteLine("[2]: Accedi");
+                Console.WriteLine("[3]: Esci");
+                string scelta = Console.ReadLine()?.Trim() ?? "Campo Obligatorio";
+
+                // Gestione delle scelte dell'utente
+                scelta = scelta.Trim();
+                switch (scelta)
+                {
+                    case "1":
+                        Registrazione(conn);    // Chiamata al metodo di registrazione
+                        break;
+                    case "2":
+                        Login(conn);            // Chiamata al metodo di login
+                        break;
+                    case "3":
+                        esci = true;            // uscita dal ciclo
+                        break;
+                    default:
+                        Console.WriteLine("Opzione non valida.");
+                        break;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Gestione delle eccezioni durante la connessione al database
+            Console.WriteLine("Errore: " + ex.Message);
+        }
+    }
+
+    // Metodo per la registrazione di un nuovo utente
+    private static void Registrazione(MySqlConnection conn)
+    {
+        // Inserimento dei dati dell'utente
+        Console.Write("Inserisci il tuo nome: ");
+        string nome = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
+
+        Console.Write("Inserisci il tuo cognome: ");
+        string cognome = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
+
+        Console.Write("Inserisci la tua email: ");
+        string email = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
+
+        Console.Write("Inserisci la tua password: ");
+        string password = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
+
+        Console.Write("Inserisci il tuo telefono: ");
+        string telefono = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
+
+
+        // Query per inserire un nuovo utente nel database
+        string query = "INSERT INTO utente (nome, cognome, email, password, telefono) VALUES (@nome, @cognome, @email, @password, @telefono)";
+        using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+        // Aggiunta dei parametri alla query per prevenire SQL injection
+        cmd.Parameters.AddWithValue("@nome", nome);
+        cmd.Parameters.AddWithValue("@cognome", cognome);
+        cmd.Parameters.AddWithValue("@email", email);
+        cmd.Parameters.AddWithValue("@password", password);
+        cmd.Parameters.AddWithValue("@telefono", telefono);
+
+        try
+        {
+            // Esecuzione della query per inserire l'utente
+            int row = cmd.ExecuteNonQuery();
+            if (row > 0)
+            {
+                Console.WriteLine("Registrazione avvenuta con successo!");
+            }
+            else
+            {
+                Console.WriteLine("Registrazione fallita.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Gestione delle eccezioni durante l'inserimento nel database
+            Console.WriteLine("Errore durante la registrazione: " + ex.Message);
         }
 
-        if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-        {
-            Console.WriteLine("Password troppo corta. Deve contenere almeno 6 caratteri.");
-            return;
-        }
+    }
 
-        if (telefono.Length < 8 || telefono.Length > 15)
-        {
-            Console.WriteLine("Numero di telefono non valido.");
-            return;
-        }
+}
 
-        // controllo email gia registrate
-        string checkQuery = "SELECT COUNT(*) FROM utenti WHERE email = @Email";
-        using var checkCmd = new MySqlCommand(checkQuery, conn);
-        checkCmd.Parameters.AddWithValue("@Email", email);
-        long count = (long)checkCmd.ExecuteScalar();
-        if (count > 0)
-        {
-            Console.WriteLine("Email già registrata.");
-            return;
-        } 
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
