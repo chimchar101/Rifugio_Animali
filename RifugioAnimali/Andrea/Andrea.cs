@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
 using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Asn1.Cms;
 
 public abstract class Utente { }
 
@@ -16,6 +14,13 @@ public class Staff : Utente
     public Staff(int staffID)
     {
         _staffID = staffID;
+    }
+
+    private enum InvType
+    {
+        cibo,
+        medicina,
+        accessorio
     }
 
     private int SelectSpecieID(MySqlConnection connection)
@@ -129,6 +134,12 @@ public class Staff : Utente
             cmd.Parameters.AddWithValue("@cliente_id", clienteID);
             cmd.Parameters.AddWithValue("@staff_id", StaffID);
             cmd.ExecuteNonQuery();
+
+            sql = @"update animale set adottato = true where animale_id = @animale_id";
+            cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@animale_id", animaleID);
+            cmd.ExecuteNonQuery();
+
             Console.WriteLine("Animale affidato con successo.");
         }
         catch (Exception ex)
@@ -261,18 +272,350 @@ public class Staff : Utente
         }
     }
 
+    private int SelectOrAddCategoriaID(MySqlConnection connection, string categoria)
+    {
+        string sql = @"select categoria_id, nome, descrizione from @categoria;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@categoria", categoria);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("id -- categoria -- descrizione");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+        }
+        rdr.Close();
+        Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
+        int categoriaID = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+        if (categoriaID == 0)
+        {
+            Console.Write("Inserisci nome: ");
+            string nomeCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            nomeCategoria = nomeCategoria.ToLower().Trim();
+            Console.Write("Inserisci descrizione: ");
+            string descrizioneCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            descrizioneCategoria = descrizioneCategoria.ToLower().Trim();
+
+            sql = @"insert into @categoria(nome, descrizione)
+            values (@nome, @descrizione)";
+            cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@nome", nomeCategoria);
+            cmd.Parameters.AddWithValue("@descrizione", descrizioneCategoria);
+            cmd.Parameters.AddWithValue("@categoria", categoria);
+            cmd.ExecuteNonQuery();
+
+            sql = @"select max(categoria_id) from @categoria";
+            cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@categoria", categoria);
+            rdr = cmd.ExecuteReader();
+            rdr.Read();
+            categoriaID = (int)rdr[0];
+            rdr.Close();
+        }
+        return categoriaID;
+    }
+
+    private int AddInventarioID(MySqlConnection connection, bool scade)
+    {
+        DateTime? scadenza = null;
+        if (scade)
+        {
+            Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
+            scadenza = DateTime.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+        }
+
+        string sql = @"insert into inventario(scadenza)
+                    values (@scadenza)";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@scadenza", scadenza);
+        cmd.ExecuteNonQuery();
+
+        sql = @"select max(inventario_id) from inventario";
+        cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        rdr.Read();
+        int inventarioID = (int)rdr[0];
+        rdr.Close();
+
+        return inventarioID;
+    }
+
     private void AggiungiCibo(MySqlConnection connection)
     {
+        try
+        {
+            int categoriaID = SelectOrAddCategoriaID(connection, InvType.cibo.ToString());
 
+            Console.Write("Inserisci nome: ");
+            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            nomeCibo = nomeCibo.ToLower().Trim();
+
+            int inventarioID = AddInventarioID(connection, true);
+
+            int specieID = SelectSpecieID(connection);
+
+            string sql = @"insert into cibo(nome, categoria_id, inventario_id, specie_id)
+                values (@nome, @categoria_id, @inventario_id, @specie_id)";
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@nome", nomeCibo);
+            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+            cmd.Parameters.AddWithValue("@specie_id", specieID);
+            cmd.ExecuteNonQuery();
+
+            Console.WriteLine("Cibo aggiunto con successo");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
 
     private void AggiungiMedicina(MySqlConnection connection)
     {
+        try
+        {
+            int categoriaID = SelectOrAddCategoriaID(connection, InvType.medicina.ToString());
 
+            Console.Write("Inserisci nome: ");
+            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            nomeCibo = nomeCibo.ToLower().Trim();
+
+            int inventarioID = AddInventarioID(connection, true);
+
+            int specieID = SelectSpecieID(connection);
+
+            string sql = @"insert into medicina(nome, categoria_id, inventario_id, specie_id)
+                values (@nome, @categoria_id, @inventario_id, @specie_id)";
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@nome", nomeCibo);
+            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+            cmd.Parameters.AddWithValue("@specie_id", specieID);
+            cmd.ExecuteNonQuery();
+
+            Console.WriteLine("Medicina aggiunta con successo");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
-    
+
     private void AggiungiAccessorio(MySqlConnection connection)
     {
+        try
+        {
+            int categoriaID = SelectOrAddCategoriaID(connection, InvType.accessorio.ToString());
 
+            Console.Write("Inserisci nome: ");
+            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            nomeCibo = nomeCibo.ToLower().Trim();
+
+            Console.Write("Inserisci taglia: ");
+            string taglia = Console.ReadLine() ?? "Campo obbligatorio";
+            taglia = taglia.ToLower().Trim();
+
+            int inventarioID = AddInventarioID(connection, false);
+
+            int specieID = SelectSpecieID(connection);
+
+            string sql = @"insert into cibo(nome, taglia, categoria_id, inventario_id, specie_id)
+                values (@nome, @taglia, @categoria_id, @inventario_id, @specie_id)";
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("@nome", nomeCibo);
+            cmd.Parameters.AddWithValue("@taglia", taglia);
+            cmd.Parameters.AddWithValue("@categoria_id", categoriaID);
+            cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+            cmd.Parameters.AddWithValue("@specie_id", specieID);
+            cmd.ExecuteNonQuery();
+
+            Console.WriteLine("Accessorio aggiunto con successo");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+
+    public void RimuoviInventario(MySqlConnection connection)
+    {
+        bool exit = false;
+
+        while (!exit)
+        {
+            Console.WriteLine("\nSeleziona il tipo:");
+            Console.WriteLine("[1] Cibo");
+            Console.WriteLine("[2] Medicina");
+            Console.WriteLine("[3] Accessorio");
+            Console.Write("Scelta: ");
+            int menuAction = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+            switch (menuAction)
+            {
+                case 1:
+                    RimuoviCibo(connection);
+                    break;
+
+                case 2:
+                    RimuoviMedicina(connection);
+                    break;
+
+                case 3:
+                    RimuoviAccessorio(connection);
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida.");
+                    break;
+            }
+        }
+    }
+
+    private int SelectInventarioID(MySqlConnection connection, string tipo)
+    {
+        string sql = @"select i.inventario_id, t.nome i.scadenza from inventario i
+                    join @tipo t on i.inventario_id = t.inventario_id;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@tipo", tipo);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("id -- nome -- scadenza");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+        }
+        rdr.Close();
+        Console.Write($"Seleziona ID {tipo}: ");
+        int inventarioID = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+        return inventarioID;
+    }
+
+    private void RimuoviCibo(MySqlConnection connection)
+    {
+        int inventarioID = SelectInventarioID(connection, InvType.cibo.ToString());
+
+        string sql = @"delete from cibo where inventario_id = @inventario_id";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        sql = @"delete from inventario where inventario_id = @inventario_id";
+        cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Cibo rimosso con successo");
+    }
+
+    private void RimuoviMedicina(MySqlConnection connection)
+    {
+        int inventarioID = SelectInventarioID(connection, InvType.medicina.ToString());
+
+        string sql = @"delete from medicina where inventario_id = @inventario_id";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        sql = @"delete from inventario where inventario_id = @inventario_id";
+        cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Medicina rimossa con successo");
+    }
+
+    private void RimuoviAccessorio(MySqlConnection connection)
+    {
+        int inventarioID = SelectInventarioID(connection, InvType.accessorio.ToString());
+
+        string sql = @"delete from accessorio where inventario_id = @inventario_id";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        sql = @"delete from inventario where inventario_id = @inventario_id";
+        cmd = new MySqlCommand(sql, connection);
+        cmd.Parameters.AddWithValue("@inventario_id", inventarioID);
+        cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Accessorio rimosso con successo");
+    }
+
+    public void StampaInventario(MySqlConnection connection)
+    {
+        bool exit = false;
+
+        while (!exit)
+        {
+            Console.WriteLine("\nSeleziona il tipo:");
+            Console.WriteLine("[1] Cibo");
+            Console.WriteLine("[2] Medicina");
+            Console.WriteLine("[3] Accessorio");
+            Console.Write("Scelta: ");
+            int menuAction = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+            switch (menuAction)
+            {
+                case 1:
+                    StampaCibo(connection);
+                    break;
+
+                case 2:
+                    StampaMedicina(connection);
+                    break;
+
+                case 3:
+                    StampaAccessorio(connection);
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida.");
+                    break;
+            }
+        }
+    }
+
+    private void StampaCibo(MySqlConnection connection)
+    {
+        string sql = @"select count(c.inventario_id) as quantita, c.nome, ca.nome, s.specie
+                    from cibo c join categoria_cibo ca on c.categoria_id = ca.categoria_id
+                    join specie s on c.specie_id = s.specie_id;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("quantità -- nome -- categoria -- specie");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]);
+        }
+        rdr.Close();
+    }
+
+    private void StampaMedicina(MySqlConnection connection)
+    {
+        string sql = @"select count(m.inventario_id) as quantita, m.nome, ca.nome, s.specie
+                    from medicina m join categoria_medicina ca on m.categoria_id = ca.categoria_id
+                    join specie s on c.specie_id = s.specie_id;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("quantità -- nome -- categoria -- specie");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]);
+        }
+        rdr.Close();
+    }
+
+    private void StampaAccessorio(MySqlConnection connection)
+    {
+        string sql = @"select count(a.inventario_id) as quantita, a.nome, ca.nome, a.taglia, s.specie
+                    from accessorio a join categoria_accessorio ca on a.categoria_id = ca.categoria_id
+                    join specie s on c.specie_id = s.specie_id;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("quantità -- nome -- categoria -- taglia -- specie");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]+ " -- " + rdr[4]);
+        }
+        rdr.Close();
     }
 }
