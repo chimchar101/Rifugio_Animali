@@ -4,8 +4,8 @@ using MySql.Data.MySqlClient;
 
 public class Cliente : Utente // Classe Cliente che estende la classe Utente
 {
-    public Cliente(int utenteId, string nome, string cognome, string email, string password, string telefono, int indirizzoId) // Costruttore della classe Cliente
-        : base(utenteId, nome, cognome, email, password, telefono, indirizzoId)
+    public Cliente(int utenteId) // Costruttore della classe Cliente
+        : base(utenteId)
     {
 
     }
