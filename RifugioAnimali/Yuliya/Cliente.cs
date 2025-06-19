@@ -10,7 +10,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
 
     }
 
-    public void Registrazione(MySqlConnection connessione) // metodo per la registrazione dell'utente
+    public static void Registrazione(MySqlConnection connessione) // metodo per la registrazione dell'utente
     {
         while (true) // Ciclo per richiedere i dati fino a quando non sono validi
         {
@@ -136,6 +136,23 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                 {
                     Console.WriteLine("Errore durante la registrazione: " + ex.Message);
                 }
+            }
+
+            int utenteId;
+            string queryUtenteId = "select max(utente_id) from utente";
+            using (MySqlCommand cmd = new MySqlCommand(queryUtenteId, connessione))
+            {
+                MySqlDataReader rdr = cmd.ExecuteReader();
+                rdr.Read();
+                utenteId = (int)rdr[0];
+                rdr.Close();
+            }
+
+            string queryCliente = "insert into cliente(utente_id) values(@utente_id)";
+            using (MySqlCommand cmd = new MySqlCommand(queryCliente, connessione))
+            {
+                cmd.Parameters.AddWithValue("@utente_id", utenteId);
+                cmd.ExecuteNonQuery();
             }
 
             break; // Esce dal ciclo
@@ -360,7 +377,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         }
     }
 
-    void VisualizzaDettaglioClinico(MySqlConnection connessione, int animaleId)
+    public void VisualizzaDiarioClinico(MySqlConnection connessione, int animaleId)
     {
         string query = @"SELECT animale.id, animale.nome, animale.vaccinato, diario_clinico.numero_visite, diario_clinico.ultima_visita, diario_clinico.prossimo_richiamo AS storico
         FROM animale

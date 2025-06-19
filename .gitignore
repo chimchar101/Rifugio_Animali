@@ -51,3 +51,4 @@ Module.symvers
 Mkfile.old
 dkms.conf
 /RifugioAnimali/obj
+/RifugioAnimali/bin/Debug

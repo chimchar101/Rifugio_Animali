@@ -10,39 +10,30 @@ public abstract class Utente
     public int UtenteId { get; set; }  // ID dell'utente
 
     // Costruttore per inizializzare un utente
-        public Utente(int utenteId)
+    public Utente(int utenteId)
+    {
+        if (utenteId <= 0)
         {
-            if (utenteId <= 0)
-            {
-                throw new ArgumentException("ID utente non valido. Deve essere maggiore di zero.");
-            }
-
-            UtenteId = utenteId;
+            throw new ArgumentException("ID utente non valido. Deve essere maggiore di zero.");
         }
 
+        UtenteId = utenteId;
+    }
+
     // Metodo per la registrazione
-    public static void Login(MySqlConnection conn)  
+    public static int? Login(MySqlConnection conn)
     {
-        int? LoggedUserId = null;    // Variabile per memorizzare l'ID dell'utente loggato
+        int LoggedUserId;    // Variabile per memorizzare l'ID dell'utente loggato
 
         // Verifica se l'email è valida
         Console.Write("Inserisci la tua email: ");
-        string email = Console.ReadLine()?.Trim();
-        if (string.IsNullOrEmpty(email))
-        {
-            Console.WriteLine("Email obbligatoria.");
-            return;
-        }
+        string email = Console.ReadLine()?.Trim() ?? "Campo obbligatorio";
 
         // Verifica se la password è valida
         Console.Write("Inserisci la tua password: ");
-        string password = Console.ReadLine()?.Trim();
-        if (string.IsNullOrEmpty(password))
-        {
-            Console.WriteLine("Password obbligatoria.");
-            return;
-        }
-        
+        string password = Console.ReadLine()?.Trim() ?? "Campo obbligatorio";
+
+
         // Query per verificare le credenziali dell'utente
         string query = "SELECT * FROM utente WHERE email = @Email AND password = @Password";
         using MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -51,35 +42,43 @@ public abstract class Utente
         cmd.Parameters.AddWithValue("@Email", email);
         cmd.Parameters.AddWithValue("@Password", password);
 
-        try
-        {
-            // Esecuzione della query e lettura dei risultati
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                LoggedUserId = Convert.ToInt32(reader["id"]);   // Recupero dell'ID dell'utente loggato
-                Console.WriteLine("Accesso riuscito! Benvenuto " + reader["nome"]);
 
-            }
-            else
-            {
-                Console.WriteLine("Email o password errati.");
-            }
-        }
-        catch (Exception ex)
+        // Esecuzione della query e lettura dei risultati
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
         {
-            Console.WriteLine("Errore durante l'accesso: " + ex.Message);
+            LoggedUserId = Convert.ToInt32(reader["id"]);   // Recupero dell'ID dell'utente loggato
+            Console.WriteLine("Accesso riuscito! Benvenuto " + reader["nome"]);
+            return LoggedUserId;
+
         }
+        else
+        {
+            Console.WriteLine("Email o password errati.");
+            return null;
+        }
+
     }
 
 }
+
+
 public class Program
 {
+    public enum TipoUtente
+    {
+        cliente,
+        staff,
+        responsabile
+    }
+
     public static void Main(string[] args)
     {
         // Stringa di connessione al database MySQL locale
         string connStr = "server=localhost; user=root; password=1234; port=3306; database=rifugio_animali;";
         using MySqlConnection conn = new MySqlConnection(connStr);
+
+        Utente utente;
 
         try
         {
@@ -106,10 +105,26 @@ public class Program
                 switch (scelta)
                 {
                     case "1":
-                        Registrazione(conn);    // Chiamata al metodo di registrazione
+                        Cliente.Registrazione(conn);    // Chiamata al metodo di registrazione
                         break;
                     case "2":
-                        Login(conn);            // Chiamata al metodo di login
+                        int? utenteID = Utente.Login(conn);            // Chiamata al metodo di login
+                        if (utenteID != null)
+                        {
+                            TipoUtente tipoUtente = ControllaTipo(conn, (int)utenteID);
+                            switch (tipoUtente)
+                            {
+                                case TipoUtente.cliente:
+
+                                    break;
+
+                                case TipoUtente.staff:
+                                    break;
+
+                                case TipoUtente.responsabile:
+                                    break;
+                            }
+                        }
                         break;
                     case "3":
                         esci = true;            // uscita dal ciclo
@@ -179,6 +194,82 @@ public class Program
 
     }
 
+    private static TipoUtente ControllaTipo(MySqlConnection conn, int utenteID)
+    {
+        string query = "select * from cliente where utente_id = @utente_id";
+        MySqlCommand cmd = new MySqlCommand(query, conn);
+        cmd.Parameters.AddWithValue("@utente_id", utenteID);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+
+        if (rdr.Read())
+        {
+            rdr.Close();
+            return (TipoUtente.cliente);
+        }
+        rdr.Close();
+
+        query = "select is_admin from staff where utente_id = @utente_id";
+        cmd = new MySqlCommand(query, conn);
+        cmd.Parameters.AddWithValue("@utente_id", utenteID);
+        rdr = cmd.ExecuteReader();
+        rdr.Read();
+        bool isAdmin = (bool)rdr[0];
+        rdr.Close();
+
+        if (isAdmin)
+        {
+            return (TipoUtente.responsabile);
+        }
+        else
+        {
+            return (TipoUtente.staff);
+        }
+    }
+
+    private static void MenuCliente(MySqlConnection connection, int utenteId)
+    {
+        bool exit = false;
+        Cliente cliente= new Cliente(utenteId);
+        
+        while (!exit)
+        {
+            Console.WriteLine("\nMenù");
+            Console.WriteLine("[1] Visualizza animali");
+            Console.WriteLine("[2] Visualizza adozioni");
+            Console.WriteLine("[3] Modifica profilo");
+            Console.WriteLine("[4] Visualizza diario clinico");
+            Console.WriteLine("[0] Esci");
+            Console.Write("Scelta: ");
+            int menuAction = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+            switch (menuAction)
+            {
+                case 1:
+                    cliente.StampaAnimali(connection);
+                    break;
+
+                case 2:
+                    cliente.StampaAdozioni(connection);
+                    break;
+
+                case 3:
+                    cliente.ModificaProfilo(connection);
+                    break;
+
+                case 4:
+                    cliente.VisualizzaDiarioClinico(connection, );
+                    break;
+
+                case 0:
+                    exit = true;
+                    break;
+
+                default:
+                    Console.WriteLine("Scelta non valida.");
+                    break;
+            }
+        }
+    }
 }
 
 
