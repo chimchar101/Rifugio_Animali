@@ -7,21 +7,21 @@ using MySql.Data.MySqlClient;
 public abstract class Utente
 {
     // Proprietà base comuni a tutti gli utenti
-    public string Nome { get; set; }
-    public string Cognome { get; set; }
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string Telefono { get; set; }
+    public int UtenteId { get; set; }  // ID dell'utente
 
     // Costruttore per inizializzare un utente
-    public Utente(string nome, string cognome, string email, string password, string telefono)
+    public Utente(int UtenteId)
     {
-        Nome = nome;
-        Cognome = cognome;
-        Email = email;
-        Password = password;
-        Telefono = telefono;
+        if (int.TryParse(UtenteId, out int id))
+        {
+            UtenteId = id;  // Imposta l'ID dell'utente se è valido
+        }
+        else
+        {
+            throw new ArgumentException("ID utente non valido.");
+        }
     }
+
 
     // Metodo per la registrazione
     public static void Login(MySqlConnection conn)  
