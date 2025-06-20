@@ -37,3 +37,42 @@ join cliente c on c.utente_id = u.utente_id
 join adozione ad on ad.cliente_id = c.cliente_id
 group by c.cliente_id
 having numero_adozioni > 0; */
+
+
+/*
+1.Quanti animali ho attualmente nel rifugio?
+
+string query = @"SELECT COUNT(*) AS totale_animali FROM animale WHERE adottato = false";
+
+
+
+
+2.Quanti sono stati vaccinati? E quanti no?
+
+	string queryVaccinati = "SELECT COUNT(*) FROM animale WHERE vaccinato = true";
+	string queryNonVaccinati = "SELECT COUNT(*) FROM animale WHERE vaccinato = false";
+
+
+
+
+3.Qual è l’età media per specie? (per capire ad esempio se ospiti più cuccioli o adulti)
+
+string query = @"
+	SELECT specie, AVG(eta) AS eta_media
+	FROM animale
+	JOIN specie ON animale.specie_id = specie.specie_id
+	GROUP BY specie";
+
+
+
+
+4.Ci sono animali da molto tempo non ancora adottati?
+→ segnalazione per azioni mirate (es. campagne di adozione)
+
+string query = @"
+	SELECT animale_id, nome, specie, data_ingresso
+	FROM animale
+	WHERE adottato = false
+		AND data_ingresso <= DATE_SUB(CURDATE(), INTERVAL @sogliaGiorni DAY)
+	ORDER BY data_ingresso ASC";
+*/
