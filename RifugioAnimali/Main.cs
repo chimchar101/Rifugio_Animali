@@ -76,3 +76,18 @@ string query = @"
 		AND data_ingresso <= DATE_SUB(CURDATE(), INTERVAL @sogliaGiorni DAY)
 	ORDER BY data_ingresso ASC";
 */
+
+/*
+-- Quali specie sono più frequenti nel rifugio?
+
+select s.specie as Nome_Specie, count(*) as Numero
+from animale a
+join specie s on s.specie_id = a.specie_id
+group by s.specie
+order by Numero desc;
+
+-- Percentuale di animali vaccinati
+
+SELECT ROUND(SUM(vaccinato) * 100.0 / COUNT(*), 2) AS Percentuale_Vaccinati
+FROM animale;
+*/
