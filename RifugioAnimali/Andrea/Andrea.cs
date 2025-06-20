@@ -79,7 +79,7 @@ public class Staff : Utente
             from animale a join specie s on s.specie_id = a.specie_id
             where s.specie_id = @specie_id and a.adottato = false";
             MySqlCommand cmd = new MySqlCommand(sql, connection);
-            cmd.Parameters.AddWithValue("@specie_id", 1);
+            cmd.Parameters.AddWithValue("@specie_id", specieID);
             MySqlDataReader rdr = cmd.ExecuteReader();  // seleziona lista animali non adottati della specie selezionata
 
             if (!rdr.Read())
