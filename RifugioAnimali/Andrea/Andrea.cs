@@ -242,7 +242,7 @@ public class Staff : Utente
             rdr2.Close();
 
             cmd.Parameters.AddWithValue("@animale_id", animaleID);
-            cmd.Parameters.AddWithValue("@staff_id", 1);
+            cmd.Parameters.AddWithValue("@staff_id", StaffId);
             cmd.ExecuteNonQuery();  // aggiunge i dati di ingresso nella tabella ingresso
 
             Console.WriteLine("Animale aggiunto con successo.");
@@ -610,7 +610,6 @@ public class Staff : Utente
         int inventarioID = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
         return inventarioID;
     }
-
 
     private void RimuoviCibo(MySqlConnection connection) // rimuove un elemento da inventario e cibo
     {
