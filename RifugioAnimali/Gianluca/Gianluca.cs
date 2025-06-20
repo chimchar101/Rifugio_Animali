@@ -880,16 +880,17 @@ public class Program
             Console.WriteLine("[2] Affida animale");
             Console.WriteLine("[3] Aggiungi animale");
             Console.WriteLine("[4] Visualizza adozioni");
-            Console.WriteLine("[5] Aggiungi inventario");
-            Console.WriteLine("[6] Rimuovi inventario");
-            Console.WriteLine("[7] Visualizza inventario");
-            Console.WriteLine("[8] Aggiungi specie");
-            Console.WriteLine("[9] Aggiungi staff");
-            Console.WriteLine("[10] Rimuovi staff");
-            Console.WriteLine("[11] Visualizza staff");
-            Console.WriteLine("[12] Visualizza clienti");
-            Console.WriteLine("[13] Modifica profilo personale");
-            Console.WriteLine("[14] Modifica utente");
+            Console.WriteLine("[5] Aggiorna diario clinico animale");
+            Console.WriteLine("[6] Aggiungi inventario");
+            Console.WriteLine("[7] Rimuovi inventario");
+            Console.WriteLine("[8] Visualizza inventario");
+            Console.WriteLine("[9] Aggiungi specie");
+            Console.WriteLine("[10] Aggiungi staff");
+            Console.WriteLine("[11] Rimuovi staff");
+            Console.WriteLine("[12] Visualizza staff");
+            Console.WriteLine("[13] Visualizza clienti");
+            Console.WriteLine("[14] Modifica profilo personale");
+            Console.WriteLine("[15] Modifica utente");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
@@ -913,42 +914,46 @@ public class Program
                     break;
 
                 case "5":
-                    responsabile.AggiungiInventario(connection);
+                    responsabile.AggiornaDiarioClinico(connection);
                     break;
 
                 case "6":
-                    responsabile.RimuoviInventario(connection);
+                    responsabile.AggiungiInventario(connection);
                     break;
 
                 case "7":
-                    responsabile.StampaInventario(connection);
+                    responsabile.RimuoviInventario(connection);
                     break;
 
                 case "8":
-                    responsabile.AggiungiSpecie(connection);
+                    responsabile.StampaInventario(connection);
                     break;
 
                 case "9":
-                    responsabile.RegistrazioneStaff(connection);
+                    responsabile.AggiungiSpecie(connection);
                     break;
 
                 case "10":
-                    responsabile.RimuoviStaff(connection);
+                    responsabile.RegistrazioneStaff(connection);
                     break;
 
                 case "11":
-                    responsabile.StampaStaff(connection);
+                    responsabile.RimuoviStaff(connection);
                     break;
 
                 case "12":
-                    responsabile.StampaClienti(connection);
+                    responsabile.StampaStaff(connection);
                     break;
 
                 case "13":
-                    responsabile.ModificaProfilo(connection, responsabile.UtenteId);
+                    responsabile.StampaClienti(connection);
                     break;
 
                 case "14":
+                    responsabile.ModificaProfilo(connection, responsabile.UtenteId);
+                    break;
+
+                case "15":
                     responsabile.ModificaUtente(connection);
                     break;
 
