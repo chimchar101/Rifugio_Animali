@@ -20,8 +20,8 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         _utenteId = utenteId;
 
         string sql = @"SELECT cliente_id 
-                      FROM cliente 
-                      WHERE utente_id = @utente_id";
+                    FROM cliente 
+                    WHERE utente_id = @utente_id";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         cmd.Parameters.AddWithValue("@utente_id", utenteId);
         MySqlDataReader rdr = cmd.ExecuteReader();
@@ -190,7 +190,9 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             {
                 if (reader.HasRows) // Controlla se ci sono animali disponibili
                 {
-                    Console.WriteLine("Animali disponibili per l'adozione:");
+                    Console.WriteLine("--------------------------------------------------");
+                    Console.WriteLine("ELENCO ANIMALI DISPONIBILI PER L'ADOZIONE");
+                    Console.WriteLine("--------------------------------------------------");
                     while (reader.Read())
                     {
                         Console.WriteLine($"ID: {reader["animale_id"]}, Nome: {reader["nome"]}, Specie: {reader["specie"]}, Età: {reader["eta"]}");
@@ -215,7 +217,9 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             {
                 if (reader.HasRows) // Controlla se ci sono adozioni effettuate dal cliente
                 {
-                    Console.WriteLine("Le tue adozioni:");
+                    Console.WriteLine("--------------------------------------------------");
+                    Console.WriteLine("ELENCO ADOZIONI EFFETTUATE");
+                    Console.WriteLine("--------------------------------------------------");
                     while (reader.Read())
                     {
                         Console.WriteLine($"ID Adozione: {reader["adozione_id"]}, Animale Nome: {reader["nome"]}, Data Adozione: {reader["data"]}");
@@ -424,13 +428,15 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
     public void VisualizzaDiarioClinico(MySqlConnection connection)
     {
         string sql = @"SELECT animale_id, nome, eta 
-                     FROM animale;";
+                    FROM animale;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("ID -- NOME -- ETA'");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO ANIMALI");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+            Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Età: {rdr[2]}");
         }
         rdr.Close();
         Console.Write("Seleziona ID animale: ");
@@ -520,7 +526,8 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             return true;
         }
     */
-    public void AggiornaDiarioClinico(MySqlConnection connection) // metodo per aggiornare i dati del diario clinico
+
+    /* public void AggiornaDiarioClinico(MySqlConnection connection) // metodo per aggiornare i dati del diario clinico
     {
         string sql = @"SELECT animale_id, nome, eta FROM animale;"; // stampo prima gli animali
         MySqlCommand cmd = new MySqlCommand(sql, connection);
@@ -553,8 +560,9 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             Console.WriteLine("Nessun diario trovato con l'ID specificato.");
         }
     }
+ */
 
-    public void StampaDisegno()
+    /* public void StampaDisegno()
     {
         Console.WriteLine("      (\\___/)");
         Console.WriteLine("     ( o   o )");
@@ -564,5 +572,5 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         Console.WriteLine("   (           )");
         Console.WriteLine("  ( (  )   (  ) )");
         Console.WriteLine(" (__(__)___(__)__)");
-    }
+    } */
 }

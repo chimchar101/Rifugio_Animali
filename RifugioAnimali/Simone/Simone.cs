@@ -215,7 +215,7 @@ public class Responsabile : Staff
         {
             MySqlDataReader reader = cmd.ExecuteReader();
             Console.WriteLine("--------------------------------------------------");
-            Console.WriteLine("ELENCO STAFF");
+            Console.WriteLine("ELENCO VOLONTARI");
             Console.WriteLine("--------------------------------------------------");
             while (reader.Read())
             {
@@ -254,7 +254,30 @@ public class Responsabile : Staff
 
     public void StampaUtenti(MySqlConnection connection)
     {
-        // stampa tutti gli utenti con utente_id
+        string query = @"select u.utente_id, u.nome as Nome, u.cognome as Cognome, u.email as Email, u.telefono as Telefono, i.indirizzo as Indirizzo, c.citta as Citta
+                        from utente u
+                        join indirizzo i on i.indirizzo_id = u.indirizzo_id
+                        join citta c on c.citta_id = i.citta_id
+                        where u.utente_id not in(
+                            select utente_id from staff where is_admin = true
+                        )";
+        MySqlCommand cmd = new MySqlCommand(query, connection);
+        try
+        {
+            MySqlDataReader reader = cmd.ExecuteReader();
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("ELENCO UTENTI");
+            Console.WriteLine("--------------------------------------------------");
+            while (reader.Read())
+            {
+                Console.WriteLine($"ID: {reader["utente_id"]}, Nome: {reader["Nome"]}, Cognome: {reader["Cognome"]}, Email: {reader["Email"]}, Telefono: {reader["Telefono"]}, Indirizzo: {reader["Indirizzo"]}, Città: {reader["Citta"]}");
+            }
+            reader.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Errore durante la stampa dello staff: " + ex.Message);
+        }
     }
     public void ModificaUtente(MySqlConnection connection)
     {

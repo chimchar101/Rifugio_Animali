@@ -618,6 +618,7 @@ public class Program
             while (!esci)
             {
                 Console.WriteLine("Benvenuto nel nostro rifuggio animali: ");
+                StampaDisegno();
                 Console.WriteLine("Scegli un'opzione: ");
                 Console.WriteLine("[1]: Registrati");
                 Console.WriteLine("[2]: Accedi");
@@ -813,6 +814,7 @@ public class Program
             Console.WriteLine("[6] Rimuovi inventario");
             Console.WriteLine("[7] Visualizza inventario");
             Console.WriteLine("[8] Modifica profilo personale");
+            Console.WriteLine("[9] Aggiorna diario clinico animale");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
@@ -849,6 +851,10 @@ public class Program
 
                 case "8":
                     staff.ModificaProfilo(connection, staff.UtenteId);
+                    break;
+
+                case "9":
+                    staff.AggiornaDiarioClinico(connection);
                     break;
 
                 case "0":
@@ -957,4 +963,15 @@ public class Program
         }
     }
 
+    public static void StampaDisegno()
+    {
+        Console.WriteLine("      (\\___/)");
+        Console.WriteLine("     ( o   o )");
+        Console.WriteLine("     (  =^=  )");
+        Console.WriteLine("     (       )");
+        Console.WriteLine("    (         )");
+        Console.WriteLine("   (           )");
+        Console.WriteLine("  ( (  )   (  ) )");
+        Console.WriteLine(" (__(__)___(__)__)");
+    }
 }

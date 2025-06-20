@@ -40,10 +40,12 @@ public class Staff : Utente
         string sql = @"select specie_id, specie from specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- specie");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO SPECIE");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1]);
+            Console.WriteLine($"ID: {rdr[0]}, Specie: {rdr[1]}");
         }
         rdr.Close();
         Console.Write("Seleziona ID specie: ");
@@ -57,10 +59,12 @@ public class Staff : Utente
                     from animale a join specie s on s.specie_id = a.specie_id;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- specie -- nome -- età -- vaccinato -- adottato");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO ANIMALI");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3] + " -- " + rdr[4] + " -- " + rdr[5]);
+            Console.WriteLine($"ID: {rdr[0]}, Specie: {rdr[1]}, Nome: {rdr[2]}, Età: {rdr[3]}, Vaccinato: {rdr[4]}, Adottato: {rdr[5]}");
         }
         rdr.Close();
     }
@@ -87,10 +91,13 @@ public class Staff : Utente
             rdr.Close();
 
             rdr = cmd.ExecuteReader();
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("ELENCO ANIMALI");
+            Console.WriteLine("--------------------------------------------------");
             Console.WriteLine("id -- specie -- nome -- età -- vaccinato");
             while (rdr.Read())
             {
-                Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3] + " -- " + rdr[4]);
+                Console.WriteLine($"ID: {rdr[0]}, Specie: {rdr[1]}, Nome: {rdr[2]}, Età: {rdr[3]}, Vaccinato: {rdr[4]}");
             }
             rdr.Close();
 
@@ -123,10 +130,12 @@ public class Staff : Utente
             rdr.Close();
 
             rdr = cmd.ExecuteReader();
-            Console.WriteLine("id -- nome -- cognome -- indirizzo -- città");
+            Console.WriteLine("--------------------------------------------------");
+            Console.WriteLine("ELENCO CLIENTI");
+            Console.WriteLine("--------------------------------------------------");
             while (rdr.Read())
             {
-                Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3] + " -- " + rdr[4]);
+                Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Cognome: {rdr[2]}, Indirizzo: {rdr[3]}, Città: {rdr[4]}");
             }
             rdr.Close();
 
@@ -224,7 +233,7 @@ public class Staff : Utente
                 data = DateTime.Parse(Console.ReadLine() ?? "Campo obbligatorio");
                 cmd.Parameters.AddWithValue("@data", data);
             }
-        
+
             string sql2 = @"select max(animale_id) from animale";
             MySqlCommand cmd2 = new MySqlCommand(sql2, connection);
             MySqlDataReader rdr2 = cmd2.ExecuteReader();
@@ -251,10 +260,12 @@ public class Staff : Utente
                 join utente u on u.utente_id = c.utente_id join staff s on ad.staff_id = s.staff_id join utente u2 on u2.utente_id = s.utente_id;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();  // seleziona lista adozioni
-        Console.WriteLine("id -- data -- nome animale -- nome cliente -- nome staff");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO ADOZIONI");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3] + " -- " + rdr[4]);
+            Console.WriteLine($"ID: {rdr[0]}, Data: {rdr[1]}, Nome animale: {rdr[2]}, Nome cliente: {rdr[3]}, Nome staff: {rdr[4]}");
         }
         rdr.Close();
     }
@@ -286,7 +297,7 @@ public class Staff : Utente
             default:
                 Console.WriteLine("Scelta non valida.");
                 break;
-        
+
         }
     }
 
@@ -295,10 +306,12 @@ public class Staff : Utente
         string sql = @"select categoria_id, nome, descrizione from categoria_cibo;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- categoria -- descrizione");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO CATEGORIE");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+            Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
         Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
@@ -334,10 +347,12 @@ public class Staff : Utente
         string sql = @"select categoria_id, nome, descrizione from categoria_medicina;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- categoria -- descrizione");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO CATEGORIE");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+            Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
         Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
@@ -373,10 +388,12 @@ public class Staff : Utente
         string sql = @"select categoria_id, nome, descrizione from categoria_accessorio;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- categoria -- descrizione");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO CATEGORIE");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+            Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
         Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
@@ -442,7 +459,7 @@ public class Staff : Utente
 
             Console.Write("Inserisci quantità da aggiungere: ");
             int amount = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
-            
+
             for (int i = 0; i < amount; i++)    // aggiunge la quantità desiderata
             {
                 int inventarioID = AddInventarioID(connection, scadenza);
@@ -571,7 +588,7 @@ public class Staff : Utente
                 Console.WriteLine("Scelta non valida.");
                 break;
         }
-        
+
     }
 
     private int SelectInventarioID(MySqlConnection connection, string tipo) // seleziona inventarioID
@@ -581,10 +598,12 @@ public class Staff : Utente
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         cmd.Parameters.AddWithValue("@tipo", tipo);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- nome -- scadenza");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("INVENTARIO");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+            Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Scadenza: {rdr[2]}");
         }
         rdr.Close();
         Console.Write($"Seleziona ID {tipo}: ");
@@ -646,7 +665,7 @@ public class Staff : Utente
 
     public void StampaInventario(MySqlConnection connection) // stampa l'inventario del tipo selezionato
     {
-        
+
         Console.WriteLine("\nSeleziona il tipo:");
         Console.WriteLine("[1] Cibo");
         Console.WriteLine("[2] Medicina");
@@ -672,7 +691,7 @@ public class Staff : Utente
                 Console.WriteLine("Scelta non valida.");
                 break;
         }
-        
+
     }
 
     private void StampaCibo(MySqlConnection connection) // stampa il cibo con la quantità
@@ -683,10 +702,12 @@ public class Staff : Utente
                     group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("quantità -- nome -- categoria -- specie");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO CIBO");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]);
+            Console.WriteLine($"Quantità: {rdr[0]}, Nome: {rdr[1]}, Categoria: {rdr[2]}, Specie: {rdr[3]}");
         }
         rdr.Close();
     }
@@ -699,10 +720,12 @@ public class Staff : Utente
                     group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("quantità -- nome -- categoria -- specie");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO MEDICINE");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]);
+            Console.WriteLine($"Quantità: {rdr[0]}, Nome: {rdr[1]}, Categoria: {rdr[2]}, Specie: {rdr[3]}");
         }
         rdr.Close();
     }
@@ -715,11 +738,50 @@ public class Staff : Utente
                     group by c.nome, ca.nome, s.specie;";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("quantità -- nome -- categoria -- taglia -- specie");
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO ACCESSORI");
+        Console.WriteLine("--------------------------------------------------");
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2] + " -- " + rdr[3]+ " -- " + rdr[4]);
+            Console.WriteLine($"Quantità: {rdr[0]}, Nome: {rdr[1]}, Categoria: {rdr[2]}, Taglia: {rdr[3]}, Specie: {rdr[4]}");
         }
         rdr.Close();
     }
+
+    public void AggiornaDiarioClinico(MySqlConnection connection) // metodo per aggiornare i dati del diario clinico
+    {
+        string sql = @"SELECT animale_id, nome, eta FROM animale;"; // stampo prima gli animali
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine("ELENCO ANIMALI");
+        Console.WriteLine("--------------------------------------------------");
+        while (rdr.Read())
+        {
+            Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Età: {rdr[2]}");
+        }
+        rdr.Close();
+        Console.Write("Seleziona ID animale: "); // faccio scegliere l'animale di cui aggiornare il diario clinico
+        int animaleId = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+        string query = @"UPDATE diario_clinico 
+                        JOIN animale ON animale.diario_id = diario_clinico.diario_id 
+                        SET numero_visite = numero_visite + 1, ultima_visita = CURDATE(), prossimo_richiamo = DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
+                        WHERE animale.animale_id = @animale_id";
+        using (cmd = new MySqlCommand(query, connection)) // eseguo la query dell'update
+        {
+            cmd.Parameters.AddWithValue("@animale_id", animaleId);
+        }
+        int rows = cmd.ExecuteNonQuery();
+
+        if (rows > 0)
+        {
+            Console.WriteLine("Visita aggiornata correttamente.");
+        }
+        else
+        {
+            Console.WriteLine("Nessun diario trovato con l'ID specificato.");
+        }
+    }
+
 }
