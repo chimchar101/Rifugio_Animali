@@ -143,8 +143,18 @@ public class Responsabile : Staff
     {
         StampaVolontari(connection);
 
-        Console.WriteLine("Inserisci l'ID dello staff da rimuovere:");
-        int staffId = int.Parse(Console.ReadLine() ?? "0");
+        
+        int staffId = 0;
+        bool success = false;
+            while (!success)
+            {
+                Console.WriteLine("Inserisci l'ID dello staff da rimuovere:");
+                success = int.TryParse(Console.ReadLine(), out staffId);
+                if (!success)
+                {
+                    Console.WriteLine("Input non valido");
+                }
+            }
 
         string query = "select utente_id from staff where staff_id = @staff_id;";
         MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -283,17 +293,29 @@ public class Responsabile : Staff
     {
         StampaUtenti(connection);
 
-        Console.Write("Inserisci ID dell'utente da modificare: ");
-        int selectedUtenteId = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+        
+        int selectedUtenteId = 0;
+        bool success = false;
+            while (!success)
+            {
+                Console.Write("Inserisci ID dell'utente da modificare: ");
+                success = int.TryParse(Console.ReadLine(), out selectedUtenteId);
+                if (!success)
+                {
+                    Console.WriteLine("Input non valido");
+                }
+            }
 
         Console.WriteLine("Modifica il tuo profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Telefono\n 4. Indirizzo\n 5. Città\n 6. Esci");
-        string scelta = Console.ReadLine().Trim();
+        string scelta = Console.ReadLine()  ?? "Campo obbligatorio";
         switch (scelta)
         {
             case "1":
                 Console.WriteLine("Inserisci il nuovo nome");
-                string nome = Console.ReadLine().Trim().ToLower();
+                string nome = Console.ReadLine() ?? "Campo obbligatorio";
+                nome = nome.Trim().ToLower();
+
                 if (!string.IsNullOrEmpty(nome))
                 {
                     string query = "UPDATE utente SET nome = @nome WHERE utente_id = @UtenteID";
@@ -316,7 +338,8 @@ public class Responsabile : Staff
                 break;
             case "2":
                 Console.WriteLine("Inserisci il nuovo cognome");
-                string cognome = Console.ReadLine().Trim().ToLower();
+                string cognome = Console.ReadLine() ?? "Campo obbligatorio";
+                cognome = cognome.Trim().ToLower();
                 if (!string.IsNullOrEmpty(cognome))
                 {
                     string query = "UPDATE utente SET cognome = @cognome WHERE utente_id = @UtenteID";
@@ -339,7 +362,8 @@ public class Responsabile : Staff
                 break;
             case "3":
                 Console.WriteLine("Inserisci il nuovo telefono");
-                string telefono = Console.ReadLine().Trim().ToLower();
+                string telefono = Console.ReadLine() ?? "Campo obbligatorio";
+                telefono = telefono.Trim().ToLower();
                 if (!string.IsNullOrEmpty(telefono))
                 {
                     string query = "UPDATE utente SET telefono = @telefono WHERE utente_id = @UtenteID";
@@ -367,7 +391,8 @@ public class Responsabile : Staff
                 break;
             case "4":
                 Console.WriteLine("Inserisci il nuovo indirizzo");
-                string indirizzo = Console.ReadLine().Trim().ToLower();
+                string indirizzo = Console.ReadLine() ?? "Campo obbligatorio";
+                indirizzo = indirizzo.Trim().ToLower();
                 if (!string.IsNullOrEmpty(indirizzo))
                 {
                     string query = "UPDATE indirizzo JOIN utente ON utente.indirizzo_id = indirizzo.indirizzo_id SET indirizzo = @indirizzo WHERE utente_id = @UtenteID";
@@ -390,7 +415,8 @@ public class Responsabile : Staff
                 break;
             case "5":
                 Console.WriteLine("Inserisci la nuova città");
-                string citta = Console.ReadLine().Trim().ToLower();
+                string citta = Console.ReadLine() ?? "Campo obbligatorio";
+                citta = citta.Trim().ToLower();
                 if (!string.IsNullOrEmpty(citta))
                 {
                     string query = @"UPDATE citta JOIN indirizzo ON citta.citta_id = indirizzo.citta_id JOIN utente on utente.indirizzo_id = indirizzo.indirizzo_idSET citta = @citta 

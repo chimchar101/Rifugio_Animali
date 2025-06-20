@@ -20,7 +20,6 @@ public abstract class Utente
         UtenteId = utenteId;
     }
 
-    // Metodo per la registrazione
     public static int? Login(MySqlConnection conn)
     {
         int LoggedUserId;    // Variabile per memorizzare l'ID dell'utente loggato
@@ -66,15 +65,18 @@ public abstract class Utente
         {
             Console.WriteLine("Inserisci i tuoi dati per la registrazione:");
             Console.Write("Nome: ");
-            string nome = Console.ReadLine().Trim().ToLower();  // Legge il nome e lo converte in minuscolo e toglie gli spazi iniziali e finali
+            string nome = Console.ReadLine() ?? "Campo obbligatorio";  // Legge il nome e lo converte in minuscolo e toglie gli spazi iniziali e finali
+            nome = nome.ToLower().Trim();
             Console.Write("Cognome: ");
-            string cognome = Console.ReadLine().Trim().ToLower();
+            string cognome = Console.ReadLine() ?? "Campo obbligatorio";
+            cognome = cognome.ToLower().Trim();
 
             Console.Write("Email: ");
             string email;
             do
             {
-                email = Console.ReadLine().Trim().ToLower();
+                email = Console.ReadLine() ?? "Campo obbligatorio";
+                email = email.ToLower().Trim();
                 if (!IsEmailValid(email, connection))  // Richiama il metodo IsEmailValid per verificare se l'email è valida
                 {
                     Console.WriteLine("Inserisci un'email valida.");
@@ -85,7 +87,8 @@ public abstract class Utente
             string password;
             do
             {
-                password = Console.ReadLine().Trim();
+                password = Console.ReadLine() ?? "Campo obbligatorio";
+                password = password.Trim();
                 if (!IsPasswordValid(password, connection)) // Richiama il metodo IsPasswordValid per verificare se la password è valida
                 {
                     Console.WriteLine("Inserisci una password valida.");
@@ -96,7 +99,8 @@ public abstract class Utente
             string telefono;
             do
             {
-                telefono = Console.ReadLine().Trim();
+                telefono = Console.ReadLine() ?? "Campo obbligatorio";
+                telefono = telefono.ToLower();
                 if (!IsTelefonoValid(telefono, connection)) // Richiama il metodo IsTelefonoValid per verificare se il telefono è valido
                 {
                     Console.WriteLine("Inserisci un numero di telefono valido.");
@@ -104,9 +108,11 @@ public abstract class Utente
             } while (!IsTelefonoValid(telefono, connection));
 
             Console.Write("Indirizzo: ");
-            string indirizzo = Console.ReadLine().Trim().ToLower();
+            string indirizzo = Console.ReadLine() ?? "Campo obbligatorio";
+            indirizzo = indirizzo.ToLower();
             Console.Write("Città: ");
-            string citta = Console.ReadLine().Trim().ToLower();
+            string citta = Console.ReadLine() ?? "Campo obbligatorio";
+            citta = citta.Trim().ToLower();
 
             if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(email) || // Controlla se tutti i campi sono stati compilati
                 string.IsNullOrEmpty(password) || string.IsNullOrEmpty(telefono) ||
@@ -383,12 +389,13 @@ public abstract class Utente
     {
         Console.WriteLine("Modifica il tuo profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Email\n 4. Password\n 5. Telefono\n 6. Indirizzo\n 7. Città\n 8. Esci");
-        string scelta = Console.ReadLine().Trim();
+        string scelta = Console.ReadLine() ?? "Campo obbligatorio";
         switch (scelta)
         {
             case "1":
                 Console.WriteLine("Inserisci il nuovo nome");
-                string nome = Console.ReadLine().Trim().ToLower();
+                string nome = Console.ReadLine() ?? "Campo obbligatorio";
+                nome = nome.Trim().ToLower();
                 if (!string.IsNullOrEmpty(nome))
                 {
                     string query = @"UPDATE utente 
@@ -413,7 +420,8 @@ public abstract class Utente
                 break;
             case "2":
                 Console.WriteLine("Inserisci il nuovo cognome");
-                string cognome = Console.ReadLine().Trim().ToLower();
+                string cognome = Console.ReadLine() ?? "Campo obbligatorio";
+                cognome = cognome.Trim().ToLower();
                 if (!string.IsNullOrEmpty(cognome))
                 {
                     string query = @"UPDATE utente 
@@ -438,7 +446,8 @@ public abstract class Utente
                 break;
             case "3":
                 Console.WriteLine("Inserisci la nuova email");
-                string email = Console.ReadLine().Trim().ToLower();
+                string email = Console.ReadLine() ?? "Campo obbligatorio";
+                email = email.Trim().ToLower();
                 if (!string.IsNullOrEmpty(email))
                 {
                     string query = @"UPDATE utente 
@@ -468,7 +477,8 @@ public abstract class Utente
                 break;
             case "4":
                 Console.WriteLine("Inserisci la nuova password");
-                string password = Console.ReadLine().Trim().ToLower();
+                string password = Console.ReadLine() ?? "Campo obbligatorio";
+                password = password.Trim();
                 if (!string.IsNullOrEmpty(password))
                 {
                     string query = @"UPDATE utente 
@@ -498,7 +508,8 @@ public abstract class Utente
                 break;
             case "5":
                 Console.WriteLine("Inserisci il nuovo telefono");
-                string telefono = Console.ReadLine().Trim().ToLower();
+                string telefono = Console.ReadLine() ?? "Campo obbligatorio";
+                telefono = telefono.ToLower();
                 if (!string.IsNullOrEmpty(telefono))
                 {
                     string query = @"UPDATE utente 
@@ -528,7 +539,8 @@ public abstract class Utente
                 break;
             case "6":
                 Console.WriteLine("Inserisci il nuovo indirizzo");
-                string indirizzo = Console.ReadLine().Trim().ToLower();
+                string indirizzo = Console.ReadLine() ?? "Campo obbligatorio";
+                indirizzo = indirizzo.Trim().ToLower();
                 if (!string.IsNullOrEmpty(indirizzo))
                 {
                     string query = @"UPDATE indirizzo 
@@ -554,7 +566,8 @@ public abstract class Utente
                 break;
             case "7":
                 Console.WriteLine("Inserisci la nuova città");
-                string citta = Console.ReadLine().Trim().ToLower();
+                string citta = Console.ReadLine() ?? "Campo obbligatorio";
+                citta = citta.Trim().ToLower();
                 if (!string.IsNullOrEmpty(citta))
                 {
                     string query = @"UPDATE citta 
@@ -602,7 +615,7 @@ public class Program
         string connStr = "server=localhost; user=root; password=1234; port=3306; database=rifugio_animali;";
         using MySqlConnection conn = new MySqlConnection(connStr);
 
-        Utente utente;
+        //Utente utente;
 
         try
         {
@@ -617,12 +630,12 @@ public class Program
             // che permette all'utente di registrarsi, accedere o uscire
             while (!esci)
             {
-                Console.WriteLine("Benvenuto nel nostro rifuggio animali: ");
+                Console.WriteLine("Benvenuto nel nostro rifugio animali: ");
                 StampaDisegno();
                 Console.WriteLine("Scegli un'opzione: ");
                 Console.WriteLine("[1]: Registrati");
                 Console.WriteLine("[2]: Accedi");
-                Console.WriteLine("[3]: Esci");
+                Console.WriteLine("[0]: Esci");
                 string scelta = Console.ReadLine()?.Trim() ?? "Campo Obligatorio";
 
                 // Gestione delle scelte dell'utente
@@ -653,7 +666,7 @@ public class Program
                             }
                         }
                         break;
-                    case "3":
+                    case "0":
                         esci = true;            // uscita dal ciclo
                         break;
                     default:
@@ -668,58 +681,6 @@ public class Program
             Console.WriteLine("Errore: " + ex.Message);
         }
     }
-
-    // Metodo per la registrazione di un nuovo utente
-    /* private static void Registrazione(MySqlConnection conn)
-    {
-        // Inserimento dei dati dell'utente
-        Console.Write("Inserisci il tuo nome: ");
-        string nome = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci il tuo cognome: ");
-        string cognome = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci la tua email: ");
-        string email = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci la tua password: ");
-        string password = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
-
-        Console.Write("Inserisci il tuo telefono: ");
-        string telefono = Console.ReadLine()?.Trim() ?? "Campo oblogatorio";
-
-
-        // Query per inserire un nuovo utente nel database
-        string query = "INSERT INTO utente (nome, cognome, email, password, telefono) VALUES (@nome, @cognome, @email, @password, @telefono)";
-        using MySqlCommand cmd = new MySqlCommand(query, conn);
-
-        // Aggiunta dei parametri alla query per prevenire SQL injection
-        cmd.Parameters.AddWithValue("@nome", nome);
-        cmd.Parameters.AddWithValue("@cognome", cognome);
-        cmd.Parameters.AddWithValue("@email", email);
-        cmd.Parameters.AddWithValue("@password", password);
-        cmd.Parameters.AddWithValue("@telefono", telefono);
-
-        try
-        {
-            // Esecuzione della query per inserire l'utente
-            int row = cmd.ExecuteNonQuery();
-            if (row > 0)
-            {
-                Console.WriteLine("Registrazione avvenuta con successo!");
-            }
-            else
-            {
-                Console.WriteLine("Registrazione fallita.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Gestione delle eccezioni durante l'inserimento nel database
-            Console.WriteLine("Errore durante la registrazione: " + ex.Message);
-        }
-
-    } */
 
     private static TipoUtente ControllaTipo(MySqlConnection conn, int utenteID)
     {
