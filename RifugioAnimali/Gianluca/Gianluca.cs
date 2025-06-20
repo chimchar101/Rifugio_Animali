@@ -60,7 +60,7 @@ public abstract class Utente
 
     }
 
-    private static void Registrazione(MySqlConnection connessione) // metodo per la registrazione dell'utente
+    private static void Registrazione(MySqlConnection connection) // metodo per la registrazione dell'utente
     {
         while (true) // Ciclo per richiedere i dati fino a quando non sono validi
         {
@@ -75,33 +75,33 @@ public abstract class Utente
             do
             {
                 email = Console.ReadLine().Trim().ToLower();
-                if (!IsEmailValid(email, connessione))  // Richiama il metodo IsEmailValid per verificare se l'email è valida
+                if (!IsEmailValid(email, connection))  // Richiama il metodo IsEmailValid per verificare se l'email è valida
                 {
                     Console.WriteLine("Inserisci un'email valida.");
                 }
-            } while (!IsEmailValid(email, connessione));
+            } while (!IsEmailValid(email, connection));
 
             Console.Write("Password: ");
             string password;
             do
             {
                 password = Console.ReadLine().Trim();
-                if (!IsPasswordValid(password, connessione)) // Richiama il metodo IsPasswordValid per verificare se la password è valida
+                if (!IsPasswordValid(password, connection)) // Richiama il metodo IsPasswordValid per verificare se la password è valida
                 {
                     Console.WriteLine("Inserisci una password valida.");
                 }
-            } while (!IsPasswordValid(password, connessione));
+            } while (!IsPasswordValid(password, connection));
 
             Console.Write("Telefono: ");
             string telefono;
             do
             {
                 telefono = Console.ReadLine().Trim();
-                if (!IsTelefonoValid(telefono, connessione)) // Richiama il metodo IsTelefonoValid per verificare se il telefono è valido
+                if (!IsTelefonoValid(telefono, connection)) // Richiama il metodo IsTelefonoValid per verificare se il telefono è valido
                 {
                     Console.WriteLine("Inserisci un numero di telefono valido.");
                 }
-            } while (!IsTelefonoValid(telefono, connessione));
+            } while (!IsTelefonoValid(telefono, connection));
 
             Console.Write("Indirizzo: ");
             string indirizzo = Console.ReadLine().Trim().ToLower();
@@ -116,59 +116,103 @@ public abstract class Utente
                 continue; // Se uno o più campi sono vuoti, richiede di inserire nuovamente i dati
             }
 
-            int cittaId;    // Controlla se la città esiste
+            int cittaId = 0;
 
-            string queryCittaEsiste = "SELECT citta_id FROM citta WHERE citta = @Citta";
-            using (MySqlCommand cmd = new MySqlCommand(queryCittaEsiste, connessione))
+            // Prima query: controllo se la città esiste
+            string queryCittaEsiste = @"SELECT citta_id 
+                                        FROM citta 
+                                        WHERE citta = @Citta";
+
+            using (MySqlCommand cmd = new MySqlCommand(queryCittaEsiste, connection))
             {
                 cmd.Parameters.AddWithValue("@Citta", citta);
+
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        cittaId = Convert.ToInt32(reader["citta_id"]); // se esiste recupera id
+                        // Se esiste, prendo l'id
+                        cittaId = (int)(reader["citta_id"]);
                     }
                     else
                     {
-                        reader.Close(); // chiudiamo il reader prima di eseguire un'altra query
+                        // Chiudo il reader PRIMA di fare un'altra query
+                        reader.Close();
 
-                        string queryInsertCitta = "INSERT INTO citta (citta) VALUES (@Citta); SELECT LAST_INSERT_ID();"; // altrimenti la inserisco e recupero l'id appena inserito
-                        using (MySqlCommand insertCmd = new MySqlCommand(queryInsertCitta, connessione))
+                        // Inserisco la nuova città
+                        string queryInsertCitta = "INSERT INTO citta (citta) VALUES (@Citta)";
+                        using (MySqlCommand insertCmd = new MySqlCommand(queryInsertCitta, connection))
                         {
                             insertCmd.Parameters.AddWithValue("@Citta", citta);
-                            cittaId = Convert.ToInt32(insertCmd.ExecuteScalar()); // restituisce il primo valore della prima riga del risultato e lo salva nella variabile
+                            insertCmd.ExecuteNonQuery(); // Esegui l'insert
+                        }
+
+                        // Recupero l'ID massimo dopo l'inserimento
+                        string querySelectMax = "SELECT MAX(citta_id) AS citta_id FROM citta";
+                        using (MySqlCommand selectMaxCmd = new MySqlCommand(querySelectMax, connection))
+                        {
+                            using (MySqlDataReader reader2 = selectMaxCmd.ExecuteReader())
+                            {
+                                if (reader2.Read())
+                                {
+                                    cittaId = (int)(reader2["citta_id"]);
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            int indirizzoId;   // Controlla se l’indirizzo esiste per quella città
+            int indirizzoId = 0;
 
-            string queryIndirizzoCheck = "SELECT indirizzo_id FROM indirizzo WHERE indirizzo = @Indirizzo AND citta_id = @CittaId";
-            using (MySqlCommand cmd = new MySqlCommand(queryIndirizzoCheck, connessione))
+            // Controlla se l’indirizzo esiste per quella città
+            string queryIndirizzoEsiste = @"SELECT indirizzo_id 
+                                FROM indirizzo 
+                                WHERE indirizzo = @Indirizzo AND citta_id = @CittaId";
+
+            using (MySqlCommand cmd = new MySqlCommand(queryIndirizzoEsiste, connection))
             {
                 cmd.Parameters.AddWithValue("@Indirizzo", indirizzo);
                 cmd.Parameters.AddWithValue("@CittaId", cittaId);
-                var result = cmd.ExecuteScalar();
-                if (result != null)
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    indirizzoId = Convert.ToInt32(result); // se esiste resituisce l'id dell'indirizzo
-                }
-                else
-                {
-                    string queryInsertIndirizzo = "INSERT INTO indirizzo (indirizzo, citta_id) VALUES (@Indirizzo, @CittaId); SELECT LAST_INSERT_ID();";
-                    using (MySqlCommand insertCmd = new MySqlCommand(queryInsertIndirizzo, connessione))
+                    if (reader.Read())
                     {
-                        insertCmd.Parameters.AddWithValue("@Indirizzo", indirizzo); // altrimenti lo inserisce e recupera l'id appena creato
-                        insertCmd.Parameters.AddWithValue("@CittaId", cittaId);
-                        indirizzoId = Convert.ToInt32(insertCmd.ExecuteScalar());
+                        indirizzoId = (int)(reader["indirizzo_id"]);
+                    }
+                    else
+                    {
+                        reader.Close(); // Chiudere prima di una nuova query
+
+                        // Inserimento nuovo indirizzo
+                        string queryInsertIndirizzo = "INSERT INTO indirizzo (indirizzo, citta_id) VALUES (@Indirizzo, @CittaId)";
+                        using (MySqlCommand insertCmd = new MySqlCommand(queryInsertIndirizzo, connection))
+                        {
+                            insertCmd.Parameters.AddWithValue("@Indirizzo", indirizzo);
+                            insertCmd.Parameters.AddWithValue("@CittaId", cittaId);
+                            insertCmd.ExecuteNonQuery();
+                        }
+
+                        // Recupera l'id appena inserito
+                        string queryGetMaxId = "SELECT MAX(indirizzo_id) AS indirizzo_id FROM indirizzo";
+                        using (MySqlCommand getIdCmd = new MySqlCommand(queryGetMaxId, connection))
+                        {
+                            using (MySqlDataReader reader2 = getIdCmd.ExecuteReader())
+                            {
+                                if (reader2.Read())
+                                {
+                                    indirizzoId = (int)(reader2["indirizzo_id"]);
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             // Inserisco finalmente l'utente
             string queryUtente = "INSERT INTO utente (nome, cognome, email, password, telefono, indirizzo_id) VALUES (@Nome, @Cognome, @Email, @Password, @Telefono, @IndirizzoId)";
-            using (MySqlCommand cmd = new MySqlCommand(queryUtente, connessione))
+            using (MySqlCommand cmd = new MySqlCommand(queryUtente, connection))
             {
                 cmd.Parameters.AddWithValue("@Nome", nome);
                 cmd.Parameters.AddWithValue("@Cognome", cognome);
@@ -191,13 +235,13 @@ public abstract class Utente
         }
     }
 
-    public static void RegistrazioneCliente(MySqlConnection connessione)
+    public static void RegistrazioneCliente(MySqlConnection connection)
     {
-        Registrazione(connessione);
+        Registrazione(connection);
 
         int utenteId;
-        string queryUtenteId = "select max(utente_id) from utente";
-        using (MySqlCommand cmd = new MySqlCommand(queryUtenteId, connessione))
+        string queryUtenteId = "SELECT MAX(utente_id) FROM utente";
+        using (MySqlCommand cmd = new MySqlCommand(queryUtenteId, connection))
         {
             MySqlDataReader rdr = cmd.ExecuteReader();
             rdr.Read();
@@ -205,8 +249,8 @@ public abstract class Utente
             rdr.Close();
         }
 
-        string queryCliente = "insert into cliente(utente_id) values(@utente_id)";
-        using (MySqlCommand cmd = new MySqlCommand(queryCliente, connessione))
+        string queryCliente = "INSERT INTO cliente (utente_id) VALUES (@utente_id)";
+        using (MySqlCommand cmd = new MySqlCommand(queryCliente, connection))
         {
             cmd.Parameters.AddWithValue("@utente_id", utenteId);
             cmd.ExecuteNonQuery();
@@ -282,10 +326,10 @@ public abstract class Utente
         } while (ruolo);
     }
 
-    public static bool IsEmailValid(string email, MySqlConnection connessione) // Metodo per verificare se l'email è già registrata nel database
+    public static bool IsEmailValid(string email, MySqlConnection connection) // Metodo per verificare se l'email è già registrata nel database
     {
-        string query = "SELECT email FROM utente WHERE email = @Email"; // Query per verificare se l'email esiste già
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        string query = @"SELECT email FROM utente WHERE email = @Email"; // Query per verificare se l'email esiste già
+        using (MySqlCommand cmd = new MySqlCommand(query, connection))
         {
             cmd.Parameters.AddWithValue("@Email", email);
             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -303,10 +347,10 @@ public abstract class Utente
         }
     }
 
-    public static bool IsTelefonoValid(string telefono, MySqlConnection connessione) // Metodo per verificare se il numero di telefono è già registrato nel database
+    public static bool IsTelefonoValid(string telefono, MySqlConnection connection) // Metodo per verificare se il numero di telefono è già registrato nel database
     {
         string query = "SELECT telefono FROM utente WHERE telefono = @Telefono"; // Query per verificare se il telefono esiste già
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        using (MySqlCommand cmd = new MySqlCommand(query, connection))
         {
             cmd.Parameters.AddWithValue("@Telefono", telefono);
             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -324,7 +368,7 @@ public abstract class Utente
         }
     }
 
-    public static bool IsPasswordValid(string password, MySqlConnection connessione) // Metodo per verificare se la password è valida
+    public static bool IsPasswordValid(string password, MySqlConnection connection) // Metodo per verificare se la password è valida
     {
         // Controlla se la password è valida con controlli sulla lunghezza minima, carattere maiuscolo, minuscolo e numero
         if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit))
@@ -335,7 +379,7 @@ public abstract class Utente
         return true;
     }
 
-    public void ModificaProfilo(MySqlConnection connessione, int selectedUtenteId)
+    public void ModificaProfilo(MySqlConnection connection, int selectedUtenteId)
     {
         Console.WriteLine("Modifica il tuo profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Email\n 4. Password\n 5. Telefono\n 6. Indirizzo\n 7. Città\n 8. Esci");
@@ -347,8 +391,10 @@ public abstract class Utente
                 string nome = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(nome))
                 {
-                    string query = "UPDATE utente SET nome = @nome WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE utente 
+                                    SET nome = @nome 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@nome", nome);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
@@ -370,8 +416,10 @@ public abstract class Utente
                 string cognome = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(cognome))
                 {
-                    string query = "UPDATE utente SET cognome = @cognome WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE utente 
+                                    SET cognome = @cognome 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@cognome", cognome);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
@@ -393,14 +441,16 @@ public abstract class Utente
                 string email = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(email))
                 {
-                    string query = "UPDATE utente SET email = @email WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE utente 
+                                    SET email = @email 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@email", email);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
 
                         int rows = 0;
-                        if (IsTelefonoValid(email, connessione))
+                        if (IsTelefonoValid(email, connection))
                         {
                             rows = cmd.ExecuteNonQuery();
                         }
@@ -421,14 +471,16 @@ public abstract class Utente
                 string password = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(password))
                 {
-                    string query = "UPDATE utente SET password = @password WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE utente 
+                                    SET password = @password 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@password", password);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
 
                         int rows = 0;
-                        if (IsTelefonoValid(password, connessione))
+                        if (IsTelefonoValid(password, connection))
                         {
                             rows = cmd.ExecuteNonQuery();
                         }
@@ -449,14 +501,16 @@ public abstract class Utente
                 string telefono = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(telefono))
                 {
-                    string query = "UPDATE utente SET telefono = @telefono WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE utente 
+                                    SET telefono = @telefono 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@telefono", telefono);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
 
                         int rows = 0;
-                        if (IsTelefonoValid(telefono, connessione))
+                        if (IsTelefonoValid(telefono, connection))
                         {
                             rows = cmd.ExecuteNonQuery();
                         }
@@ -477,8 +531,11 @@ public abstract class Utente
                 string indirizzo = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(indirizzo))
                 {
-                    string query = "UPDATE indirizzo JOIN utente ON utente.indirizzo_id = indirizzo.indirizzo_id SET indirizzo = @indirizzo WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    string query = @"UPDATE indirizzo 
+                                    JOIN utente ON utente.indirizzo_id = indirizzo.indirizzo_id 
+                                    SET indirizzo = @indirizzo 
+                                    WHERE utente_id = @UtenteID";
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@indirizzo", indirizzo);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
@@ -500,9 +557,11 @@ public abstract class Utente
                 string citta = Console.ReadLine().Trim().ToLower();
                 if (!string.IsNullOrEmpty(citta))
                 {
-                    string query = @"UPDATE citta JOIN indirizzo ON citta.citta_id = indirizzo.citta_id JOIN utente on utente.indirizzo_id = indirizzo.indirizzo_idSET citta = @citta 
+                    string query = @"UPDATE citta 
+                                    JOIN indirizzo ON citta.citta_id = indirizzo.citta_id 
+                                    JOIN utente on utente.indirizzo_id = indirizzo.indirizzo_idSET citta = @citta 
                                     WHERE utente_id = @UtenteID";
-                    using (MySqlCommand cmd = new MySqlCommand(query, connessione)) // connessione deve essere già aperta
+                    using (MySqlCommand cmd = new MySqlCommand(query, connection)) // connessione deve essere già aperta
                     {
                         cmd.Parameters.AddWithValue("@citta", citta);
                         cmd.Parameters.AddWithValue("@UtenteID", selectedUtenteId);
@@ -522,12 +581,9 @@ public abstract class Utente
             default:
                 Console.WriteLine("Opzione non valida");
                 break;
-            
-
 
         }
     }
-
 }
 
 
@@ -613,7 +669,7 @@ public class Program
     }
 
     // Metodo per la registrazione di un nuovo utente
-    private static void Registrazione(MySqlConnection conn)
+    /* private static void Registrazione(MySqlConnection conn)
     {
         // Inserimento dei dati dell'utente
         Console.Write("Inserisci il tuo nome: ");
@@ -662,7 +718,7 @@ public class Program
             Console.WriteLine("Errore durante la registrazione: " + ex.Message);
         }
 
-    }
+    } */
 
     private static TipoUtente ControllaTipo(MySqlConnection conn, int utenteID)
     {

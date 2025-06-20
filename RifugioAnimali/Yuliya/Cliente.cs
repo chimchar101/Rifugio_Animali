@@ -19,7 +19,9 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
     {
         _utenteId = utenteId;
 
-        string sql = "select cliente_id from cliente where utente_id = @utente_id";
+        string sql = @"SELECT cliente_id 
+                      FROM cliente 
+                      WHERE utente_id = @utente_id";
         MySqlCommand cmd = new MySqlCommand(sql, connection);
         cmd.Parameters.AddWithValue("@utente_id", utenteId);
         MySqlDataReader rdr = cmd.ExecuteReader();
@@ -177,10 +179,12 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         }
     } */
 
-    public void StampaAnimali(MySqlConnection connessione) // Metodo per stampare gli animali disponibili per l'adozione
+    public void StampaAnimali(MySqlConnection connection) // Metodo per stampare gli animali disponibili per l'adozione
     {
-        string query = "SELECT * FROM animale join specie on specie.specie_id=animale.specie_id WHERE adottato = false "; // Solo animali non adottati
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        string query = @"SELECT * FROM animale 
+                        JOIN specie ON specie.specie_id=animale.specie_id 
+                        WHERE adottato = false "; // Solo animali non adottati
+        using (MySqlCommand cmd = new MySqlCommand(query, connection))
         {
             using (MySqlDataReader reader = cmd.ExecuteReader())
             {
@@ -199,10 +203,12 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             }
         }
     }
-    public void StampaAdozioni(MySqlConnection connessione) // Metodo per stampare le adozioni effettuate dal cliente
+    public void StampaAdozioni(MySqlConnection connection) // Metodo per stampare le adozioni effettuate dal cliente
     {
-        string query = "SELECT * FROM adozione WHERE cliente_id = @ClienteID";
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        string query = @"SELECT * FROM adozione
+                        JOIN animale ON animale.animale_id = adozione.animale_id
+                        WHERE cliente_id = @ClienteID";
+        using (MySqlCommand cmd = new MySqlCommand(query, connection))
         {
             cmd.Parameters.AddWithValue("@ClienteID", ClienteId);
             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -212,7 +218,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
                     Console.WriteLine("Le tue adozioni:");
                     while (reader.Read())
                     {
-                        Console.WriteLine($"ID Adozione: {reader["adozione_id"]}, Animale ID: {reader["animale_id"]}, Data Adozione: {reader["data"]}");
+                        Console.WriteLine($"ID Adozione: {reader["adozione_id"]}, Animale Nome: {reader["nome"]}, Data Adozione: {reader["data"]}");
                     }
                 }
                 else
@@ -415,12 +421,13 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
 
         }
     }*/
-    public void VisualizzaDiarioClinico(MySqlConnection connessione)
+    public void VisualizzaDiarioClinico(MySqlConnection connection)
     {
-        string sql = @"select animale_id, nome, eta from animale;";
-        MySqlCommand cmd = new MySqlCommand(sql, connessione);
+        string sql = @"SELECT animale_id, nome, eta 
+                     FROM animale;";
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
         MySqlDataReader rdr = cmd.ExecuteReader();
-        Console.WriteLine("id -- nome -- età");
+        Console.WriteLine("ID -- NOME -- ETA'");
         while (rdr.Read())
         {
             Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
@@ -435,7 +442,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         JOIN diario_clinico ON diario_clinico.diario_id = animale.diario_id
         WHERE animale_id = @animaleId";
 
-        using (cmd = new MySqlCommand(query, connessione))
+        using (cmd = new MySqlCommand(query, connection))
         {
             cmd.Parameters.AddWithValue("@animaleId", animaleId);
 
@@ -459,58 +466,103 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         }
     }
 
-/*
-    public static bool IsEmailValid(string email, MySqlConnection connessione) // Metodo per verificare se l'email è già registrata nel database
-    {
-        string query = "SELECT email FROM utente WHERE email = @Email"; // Query per verificare se l'email esiste già
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+    /*
+        public static bool IsEmailValid(string email, MySqlConnection connection) // Metodo per verificare se l'email è già registrata nel database
         {
-            cmd.Parameters.AddWithValue("@Email", email);
-            using (MySqlDataReader reader = cmd.ExecuteReader())
+            string query = "SELECT email FROM utente WHERE email = @Email"; // Query per verificare se l'email esiste già
+            using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
-                if (reader.Read())  // se esiste almeno una riga con quella email
+                cmd.Parameters.AddWithValue("@Email", email);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("Email già registrata.");
-                    return false;
-                }
-                else
-                {
-                    return true;
+                    if (reader.Read())  // se esiste almeno una riga con quella email
+                    {
+                        Console.WriteLine("Email già registrata.");
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
             }
         }
-    }
 
-    public static bool IsTelefonoValid(string telefono, MySqlConnection connessione) // Metodo per verificare se il numero di telefono è già registrato nel database
-    {
-        string query = "SELECT telefono FROM utente WHERE telefono = @Telefono"; // Query per verificare se il telefono esiste già
-        using (MySqlCommand cmd = new MySqlCommand(query, connessione))
+        public static bool IsTelefonoValid(string telefono, MySqlConnection connection) // Metodo per verificare se il numero di telefono è già registrato nel database
         {
-            cmd.Parameters.AddWithValue("@Telefono", telefono);
-            using (MySqlDataReader reader = cmd.ExecuteReader())
+            string query = "SELECT telefono FROM utente WHERE telefono = @Telefono"; // Query per verificare se il telefono esiste già
+            using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
-                if (reader.Read())  // se esiste almeno una riga con quel telefono
+                cmd.Parameters.AddWithValue("@Telefono", telefono);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("Telefono già registrato.");
-                    return false;
-                }
-                else
-                {
-                    return true;
+                    if (reader.Read())  // se esiste almeno una riga con quel telefono
+                    {
+                        Console.WriteLine("Telefono già registrato.");
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
                 }
             }
         }
+
+        public static bool IsPasswordValid(string password, MySqlConnection connection) // Metodo per verificare se la password è valida
+        {
+            // Controlla se la password è valida con controlli sulla lunghezza minima, carattere maiuscolo, minuscolo e numero
+            if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit))
+            {
+                Console.WriteLine("La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.");
+                return false;
+            }
+            return true;
+        }
+    */
+    public void AggiornaDiarioClinico(MySqlConnection connection) // metodo per aggiornare i dati del diario clinico
+    {
+        string sql = @"SELECT animale_id, nome, eta FROM animale;"; // stampo prima gli animali
+        MySqlCommand cmd = new MySqlCommand(sql, connection);
+        MySqlDataReader rdr = cmd.ExecuteReader();
+        Console.WriteLine("ID -- NOME -- ETA'");
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+        }
+        rdr.Close();
+        Console.Write("Seleziona ID animale: "); // faccio scegliere l'animale di cui aggiornare il diario clinico
+        int animaleId = int.Parse(Console.ReadLine() ?? "Campo obbligatorio");
+
+        string query = @"UPDATE diario_clinico 
+                        JOIN animale ON animale.diario_id = diario_clinico.diario_id 
+                        SET numero_visite = numero_visite + 1, ultima_visita = CURDATE(), prossimo_richiamo = DATE_ADD(CURDATE(), INTERVAL 1 YEAR
+                        WHERE animale_id = @animale_id)";
+        using (cmd = new MySqlCommand(query, connection)) // eseguo la query dell'update
+        {
+            cmd.Parameters.AddWithValue("@animale_id", animaleId);
+        }
+        int rows = cmd.ExecuteNonQuery();
+
+        if (rows > 0)
+        {
+            Console.WriteLine("Visita aggiornata correttamente.");
+        }
+        else
+        {
+            Console.WriteLine("Nessun diario trovato con l'ID specificato.");
+        }
     }
 
-    public static bool IsPasswordValid(string password, MySqlConnection connessione) // Metodo per verificare se la password è valida
+    public void StampaDisegno()
     {
-        // Controlla se la password è valida con controlli sulla lunghezza minima, carattere maiuscolo, minuscolo e numero
-        if (password.Length < 8 || !password.Any(char.IsUpper) || !password.Any(char.IsLower) || !password.Any(char.IsDigit))
-        {
-            Console.WriteLine("La password deve contenere almeno 8 caratteri, una maiuscola, una minuscola e un numero.");
-            return false;
-        }
-        return true;
+        Console.WriteLine("      (\\___/)");
+        Console.WriteLine("     ( o   o )");
+        Console.WriteLine("     (  =^=  )");
+        Console.WriteLine("     (        )");
+        Console.WriteLine("    (         )");
+        Console.WriteLine("   (           )");
+        Console.WriteLine("  ( (  )   (  ) )");
+        Console.WriteLine(" (__(__)___(__)__)");
     }
-*/
 }
