@@ -30,3 +30,10 @@ where an.animale_id in(
 )
 ; */
 
+/* -- Quanti clienti sono effettivamente attivi (almeno un’adozione)?
+select c.cliente_id, u.nome, u.cognome, u.email, count(ad.adozione_id) as numero_adozioni
+from utente u
+join cliente c on c.utente_id = u.utente_id
+join adozione ad on ad.cliente_id = c.cliente_id
+group by c.cliente_id
+having numero_adozioni > 0; */
