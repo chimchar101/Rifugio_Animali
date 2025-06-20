@@ -763,8 +763,8 @@ public class Program
             Console.WriteLine("\nMenu cliente");
             Console.WriteLine("[1] Visualizza animali");
             Console.WriteLine("[2] Visualizza adozioni");
-            Console.WriteLine("[3] Modifica profilo personale");
-            Console.WriteLine("[4] Visualizza diario clinico");
+            Console.WriteLine("[3] Visualizza diario clinico");
+            Console.WriteLine("[4] Modifica profilo personale");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
@@ -780,11 +780,11 @@ public class Program
                     break;
 
                 case "3":
-                    cliente.ModificaProfilo(connection, cliente.ClienteId);
+                    cliente.VisualizzaDiarioClinico(connection);
                     break;
 
                 case "4":
-                    cliente.VisualizzaDiarioClinico(connection);
+                    cliente.ModificaProfilo(connection, cliente.ClienteId);
                     break;
 
                 case "0":
@@ -810,11 +810,11 @@ public class Program
             Console.WriteLine("[2] Affida animale");
             Console.WriteLine("[3] Aggiungi animale");
             Console.WriteLine("[4] Visualizza adozioni");
-            Console.WriteLine("[5] Aggiungi inventario");
-            Console.WriteLine("[6] Rimuovi inventario");
-            Console.WriteLine("[7] Visualizza inventario");
-            Console.WriteLine("[8] Modifica profilo personale");
-            Console.WriteLine("[9] Aggiorna diario clinico animale");
+            Console.WriteLine("[5] Aggiorna diario clinico animale");
+            Console.WriteLine("[6] Aggiungi inventario");
+            Console.WriteLine("[7] Rimuovi inventario");
+            Console.WriteLine("[8] Visualizza inventario");
+            Console.WriteLine("[9] Modifica profilo personale");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
@@ -838,23 +838,23 @@ public class Program
                     break;
 
                 case "5":
-                    staff.AggiungiInventario(connection);
+                    staff.AggiornaDiarioClinico(connection);
                     break;
 
                 case "6":
-                    staff.RimuoviInventario(connection);
+                    staff.AggiungiInventario(connection);
                     break;
 
                 case "7":
-                    staff.StampaInventario(connection);
+                    staff.RimuoviInventario(connection);
                     break;
 
                 case "8":
-                    staff.ModificaProfilo(connection, staff.UtenteId);
+                    staff.StampaInventario(connection);
                     break;
 
                 case "9":
-                    staff.AggiornaDiarioClinico(connection);
+                    staff.ModificaProfilo(connection, staff.UtenteId);
                     break;
 
                 case "0":
