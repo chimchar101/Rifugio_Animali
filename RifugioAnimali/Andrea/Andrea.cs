@@ -44,22 +44,15 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO SPECIE");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Specie: {rdr[1]}");
         }
         rdr.Close();
-        int specieID = 0;
-        bool success = false;
-        while (!success)
-        {
-            Console.Write("Seleziona ID specie: ");
-            success = int.TryParse(Console.ReadLine(), out specieID);
-            if (!success)
-            {
-                Console.WriteLine("Input non valido");
-            }
-        }
+        Console.Write("Seleziona ID specie: ");
+        int specieID = Input.SelectId(idList);
         return specieID;
     }
 
@@ -105,29 +98,21 @@ public class Staff : Utente
             Console.WriteLine("ELENCO ANIMALI");
             Console.WriteLine("--------------------------------------------------");
             Console.WriteLine("id -- specie -- nome -- età -- vaccinato");
+            List<int> idList = new List<int>();
             while (rdr.Read())
             {
+                idList.Add((int)rdr[0]);
                 Console.WriteLine($"ID: {rdr[0]}, Specie: {rdr[1]}, Nome: {rdr[2]}, Età: {rdr[3]}, Vaccinato: {rdr[4]}");
             }
             rdr.Close();
-
-            int animaleID = 0;
-            bool success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID animale: ");
-                success = int.TryParse(Console.ReadLine(), out animaleID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Seleziona ID animale: ");
+            int animaleID = Input.SelectId(idList);
 
             Console.Write("Inserisci nome cliente: ");
-            string nomeCliente = Console.ReadLine() ?? "nome";
+            string nomeCliente = Input.String();
             nomeCliente = nomeCliente.ToLower().Trim();
             Console.Write("Inserisci cognome cliente: ");
-            string cognomeCliente = Console.ReadLine() ?? "cognome";
+            string cognomeCliente = Input.String();
             cognomeCliente = cognomeCliente.ToLower().Trim();
 
             sql = @"select cl.cliente_id, u.nome, u.cognome, i.indirizzo, c.citta
@@ -152,36 +137,18 @@ public class Staff : Utente
             Console.WriteLine("--------------------------------------------------");
             Console.WriteLine("ELENCO CLIENTI");
             Console.WriteLine("--------------------------------------------------");
+            idList = new List<int>();
             while (rdr.Read())
             {
+                idList.Add((int)rdr[0]);
                 Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Cognome: {rdr[2]}, Indirizzo: {rdr[3]}, Città: {rdr[4]}");
             }
             rdr.Close();
+            Console.Write("Seleziona ID cliente: ");
+            int clienteID = Input.SelectId(idList);
 
-            int clienteID = 0;
-            success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID cliente: ");
-                success = int.TryParse(Console.ReadLine(), out clienteID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
-
-            
-            bool useCurrDate = false;
-            success = false;
-            while (!success)
-            {
-                Console.Write("Usare la data di oggi? (true/false): ");
-                success = bool.TryParse(Console.ReadLine(), out useCurrDate);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Usare la data di oggi? (true/false): ");
+            bool useCurrDate = Input.Bool();
 
             sql = @"insert into adozione(data, animale_id, cliente_id, staff_id)
             values (@data, @animale_id, @cliente_id, @staff_id)";
@@ -189,18 +156,8 @@ public class Staff : Utente
 
             if (!useCurrDate)
             {
-                
-                DateTime data = new DateTime(0, 1, 1);
-                success = false;
-                while (!success)
-                {
-                    Console.Write("Inserire la data (yyyy,mm,gg): ");
-                    success = DateTime.TryParse(Console.ReadLine(), out data);
-                    if (!success)
-                    {
-                        Console.WriteLine("Input non valido");
-                    }
-                }
+                Console.Write("Inserire la data (yyyy,mm,gg): ");
+                DateTime data = Input.Datetime();
                 cmd.Parameters.AddWithValue("@data", data);
             }
 
@@ -234,46 +191,17 @@ public class Staff : Utente
             cmd.ExecuteNonQuery();  //crea un nuovo diario clinico vuoto
 
             Console.Write("Inserisci nome: ");
-            string nomeAnimale = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeAnimale = Input.String();
             nomeAnimale = nomeAnimale.ToLower().Trim();
 
-            int etaAnimale = 0;
-            bool success = false;
-            while (!success)
-            {
-                Console.Write("Inserisci età: ");
-                success = int.TryParse(Console.ReadLine(), out etaAnimale);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Inserisci età: ");
+            int etaAnimale = Input.Int();
 
-            
-            bool isVaccinato = false;
-            success = false;
-            while (!success)
-            {
-                Console.Write("E' stato vaccinato? (true/false): ");
-                success = bool.TryParse(Console.ReadLine(), out isVaccinato);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("E' stato vaccinato? (true/false): ");
+            bool isVaccinato = Input.Bool();
 
-            
-            bool isAdottato = false;
-            success = false;
-            while (!success)
-            {
-                Console.Write("E' stato adottato? (true/false): ");
-                success = bool.TryParse(Console.ReadLine(), out isAdottato);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("E' stato adottato? (true/false): ");
+            bool isAdottato = Input.Bool();
 
             sql = @"select max(diario_id) from diario_clinico";
             cmd = new MySqlCommand(sql, connection);
@@ -293,18 +221,8 @@ public class Staff : Utente
             cmd.Parameters.AddWithValue("@diario_id", diarioID);
             cmd.ExecuteNonQuery();  // aggiunge l'animale alla tabella animale
 
-            
-            bool useCurrDate = false;
-            success = false;
-            while (!success)
-            {
-                Console.Write("Usare la data di oggi? (true/false): ");
-                success = bool.TryParse(Console.ReadLine(), out useCurrDate);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Usare la data di oggi? (true/false): ");
+            bool useCurrDate = Input.Bool();
 
             sql = @"insert into ingresso(animale_id, staff_id)
             values (@animale_id, @staff_id)";
@@ -316,17 +234,8 @@ public class Staff : Utente
             {
                 sql = @"insert into ingresso(data, animale_id, staff_id)
                     values (@data, @animale_id, @staff_id)";
-                data = new DateTime(0,1,1);
-                success = false;
-                while (!success)
-                {
-                    Console.Write("Inserire la data (yyyy,mm,gg): ");
-                    success = DateTime.TryParse(Console.ReadLine(), out data);
-                    if (!success)
-                    {
-                        Console.WriteLine("Input non valido");
-                    }
-                }
+                Console.Write("Inserire la data (yyyy,mm,gg): ");
+                data = Input.Datetime();
                 cmd.Parameters.AddWithValue("@data", data);
             }
 
@@ -374,7 +283,7 @@ public class Staff : Utente
         Console.WriteLine("[2] Medicina");
         Console.WriteLine("[3] Accessorio");
         Console.Write("Scelta: ");
-        string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+        string menuAction = Input.String();
 
         switch (menuAction)
         {
@@ -405,30 +314,24 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO CATEGORIE");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
+        idList.Add(0);
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
-        
-        int categoriaID = 0;
-        bool success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
-                success = int.TryParse(Console.ReadLine(), out categoriaID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+
+        Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
+        int categoriaID = Input.SelectId(idList);
         if (categoriaID == 0)
         {
             Console.Write("Inserisci nome categoria: ");
-            string nomeCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCategoria = Input.String();
             nomeCategoria = nomeCategoria.ToLower().Trim();
             Console.Write("Inserisci descrizione: ");
-            string descrizioneCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string descrizioneCategoria = Input.String();
             descrizioneCategoria = descrizioneCategoria.ToLower().Trim();
 
             sql = @"insert into categoria_cibo(nome, descrizione)
@@ -456,30 +359,24 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO CATEGORIE");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
+        idList.Add(0);
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
-        
-        int categoriaID = 0;
-        bool success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
-                success = int.TryParse(Console.ReadLine(), out categoriaID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+
+        Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
+        int categoriaID = Input.SelectId(idList);
         if (categoriaID == 0)
         {
             Console.Write("Inserisci nome categoria: ");
-            string nomeCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCategoria = Input.String();
             nomeCategoria = nomeCategoria.ToLower().Trim();
             Console.Write("Inserisci descrizione: ");
-            string descrizioneCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string descrizioneCategoria = Input.String();
             descrizioneCategoria = descrizioneCategoria.ToLower().Trim();
 
             sql = @"insert into categoria_medicina(nome, descrizione)
@@ -507,30 +404,23 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO CATEGORIE");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
+        idList.Add(0);
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Categoria: {rdr[1]}, Descrizione: {rdr[2]}");
         }
         rdr.Close();
-        
-        int categoriaID = 0;
-        bool success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
-                success = int.TryParse(Console.ReadLine(), out categoriaID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+        Console.Write("Seleziona ID categoria o inserisci \"0\" per aggiungerne una nuova: ");
+        int categoriaID = Input.SelectId(idList);
         if (categoriaID == 0)
         {
             Console.Write("Inserisci nome categoria: ");
-            string nomeCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCategoria = Input.String();
             nomeCategoria = nomeCategoria.ToLower().Trim();
             Console.Write("Inserisci descrizione: ");
-            string descrizioneCategoria = Console.ReadLine() ?? "Campo obbligatorio";
+            string descrizioneCategoria = Input.String();
             descrizioneCategoria = descrizioneCategoria.ToLower().Trim();
 
             sql = @"insert into categoria_accessorio(nome, descrizione)
@@ -575,35 +465,15 @@ public class Staff : Utente
             int categoriaID = SelectOrAddCategoriaCiboID(connection); // seleziona categoriaID
 
             Console.Write("Inserisci nome cibo: ");
-            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCibo = Input.String();
             nomeCibo = nomeCibo.ToLower().Trim();
 
             Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
-            DateTime scadenza = new DateTime(0,1,1);
-            bool success = false;
-            while (!success)
-            {
-                Console.Write("Inserire la data (yyyy,mm,gg): ");
-                success = DateTime.TryParse(Console.ReadLine(), out scadenza);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            DateTime scadenza = Input.Datetime();
 
             int specieID = SelectSpecieID(connection);  // seleziona specieID
-            
-            int amount = 0;
-            success = false;
-            while (!success)
-            {
-                Console.Write("Inserisci quantità da aggiungere: ");
-                success = int.TryParse(Console.ReadLine(), out amount);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = Input.Int();
 
             for (int i = 0; i < amount; i++)    // aggiunge la quantità desiderata
             {
@@ -633,36 +503,16 @@ public class Staff : Utente
             int categoriaID = SelectOrAddCategoriaMedicinaID(connection);
 
             Console.Write("Inserisci nome medicina: ");
-            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCibo = Input.String();
             nomeCibo = nomeCibo.ToLower().Trim();
 
             Console.Write("Inserire la data di scadenza(yyyy,mm,gg): ");
-            DateTime scadenza = new DateTime(0,1,1);
-            bool success = false;
-            while (!success)
-            {
-                Console.Write("Inserire la data (yyyy,mm,gg): ");
-                success = DateTime.TryParse(Console.ReadLine(), out scadenza);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            DateTime scadenza = Input.Datetime();
 
             int specieID = SelectSpecieID(connection);
 
-            
-            int amount = 0;
-            success = false;
-            while (!success)
-            {
-                Console.Write("Inserisci quantità da aggiungere: ");
-                success = int.TryParse(Console.ReadLine(), out amount);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = Input.Int();
 
             for (int i = 0; i < amount; i++)
             {
@@ -692,27 +542,17 @@ public class Staff : Utente
             int categoriaID = SelectOrAddCategoriaAccessorioID(connection);
 
             Console.Write("Inserisci nome accessorio: ");
-            string nomeCibo = Console.ReadLine() ?? "Campo obbligatorio";
+            string nomeCibo = Input.String();
             nomeCibo = nomeCibo.ToLower().Trim();
 
             Console.Write("Inserisci taglia: ");
-            string taglia = Console.ReadLine() ?? "Campo obbligatorio";
+            string taglia = Input.String();
             taglia = taglia.ToLower().Trim();
 
             int specieID = SelectSpecieID(connection);
 
-            
-            int amount = 0;
-            bool success = false;
-            while (!success)
-            {
-                Console.Write("Inserisci quantità da aggiungere: ");
-                success = int.TryParse(Console.ReadLine(), out amount);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+            Console.Write("Inserisci quantità da aggiungere: ");
+            int amount = Input.Int();
 
             for (int i = 0; i < amount; i++)
             {
@@ -743,7 +583,7 @@ public class Staff : Utente
         Console.WriteLine("[2] Medicina");
         Console.WriteLine("[3] Accessorio");
         Console.Write("Scelta: ");
-        string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+        string menuAction = Input.String();
 
         switch (menuAction)
         {
@@ -776,23 +616,15 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("INVENTARIO");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Scadenza: {rdr[2]}");
         }
         rdr.Close();
-        
-        int inventarioID = 0;
-        bool success = false;
-            while (!success)
-            {
-                Console.Write($"Seleziona ID {tipo}: ");
-                success = int.TryParse(Console.ReadLine(), out inventarioID);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+        Console.Write($"Seleziona ID {tipo}: ");
+        int inventarioID = Input.SelectId(idList);
         return inventarioID;
     }
 
@@ -855,7 +687,7 @@ public class Staff : Utente
         Console.WriteLine("[2] Medicina");
         Console.WriteLine("[3] Accessorio");
         Console.Write("Scelta: ");
-        string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+        string menuAction = Input.String();
 
         switch (menuAction)
         {
@@ -940,23 +772,15 @@ public class Staff : Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO ANIMALI");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Età: {rdr[2]}");
         }
         rdr.Close();
-        
-        int animaleId = 0;
-        bool success = false;
-            while (!success)
-            {
-                Console.Write("Seleziona ID animale: "); // faccio scegliere l'animale di cui aggiornare il diario clinico
-                success = int.TryParse(Console.ReadLine(), out animaleId);
-                if (!success)
-                {
-                    Console.WriteLine("Input non valido");
-                }
-            }
+        Console.Write("Seleziona ID animale: "); // faccio scegliere l'animale di cui aggiornare il diario clinico
+        int animaleId = Input.SelectId(idList);
 
         string query = @"UPDATE diario_clinico 
                         JOIN animale ON animale.diario_id = diario_clinico.diario_id 

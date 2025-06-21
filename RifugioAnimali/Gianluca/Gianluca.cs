@@ -26,12 +26,13 @@ public abstract class Utente
 
         // Verifica se l'email è valida
         Console.Write("Inserisci la tua email: ");
-        string email = Console.ReadLine()?.Trim() ?? "Campo obbligatorio";
+        string email = Input.String();
+        email = email.Trim().ToLower();
 
         // Verifica se la password è valida
         Console.Write("Inserisci la tua password: ");
-        string password = Console.ReadLine()?.Trim() ?? "Campo obbligatorio";
-
+        string password = Input.String();
+        password = password.Trim();
 
         // Query per verificare le credenziali dell'utente
         string query = "SELECT * FROM utente WHERE email = @Email AND password = @Password";
@@ -65,17 +66,17 @@ public abstract class Utente
         {
             Console.WriteLine("Inserisci i tuoi dati per la registrazione:");
             Console.Write("Nome: ");
-            string nome = Console.ReadLine() ?? "Campo obbligatorio";  // Legge il nome e lo converte in minuscolo e toglie gli spazi iniziali e finali
+            string nome = Input.String();  // Legge il nome e lo converte in minuscolo e toglie gli spazi iniziali e finali
             nome = nome.ToLower().Trim();
             Console.Write("Cognome: ");
-            string cognome = Console.ReadLine() ?? "Campo obbligatorio";
+            string cognome = Input.String();
             cognome = cognome.ToLower().Trim();
 
             Console.Write("Email: ");
             string email;
             do
             {
-                email = Console.ReadLine() ?? "Campo obbligatorio";
+                email = Input.String();
                 email = email.ToLower().Trim();
                 if (!IsEmailValid(email, connection))  // Richiama il metodo IsEmailValid per verificare se l'email è valida
                 {
@@ -87,7 +88,7 @@ public abstract class Utente
             string password;
             do
             {
-                password = Console.ReadLine() ?? "Campo obbligatorio";
+                password = Input.String();
                 password = password.Trim();
                 if (!IsPasswordValid(password, connection)) // Richiama il metodo IsPasswordValid per verificare se la password è valida
                 {
@@ -99,7 +100,7 @@ public abstract class Utente
             string telefono;
             do
             {
-                telefono = Console.ReadLine() ?? "Campo obbligatorio";
+                telefono = Input.String();
                 telefono = telefono.ToLower();
                 if (!IsTelefonoValid(telefono, connection)) // Richiama il metodo IsTelefonoValid per verificare se il telefono è valido
                 {
@@ -108,10 +109,10 @@ public abstract class Utente
             } while (!IsTelefonoValid(telefono, connection));
 
             Console.Write("Indirizzo: ");
-            string indirizzo = Console.ReadLine() ?? "Campo obbligatorio";
+            string indirizzo = Input.String();
             indirizzo = indirizzo.ToLower();
             Console.Write("Città: ");
-            string citta = Console.ReadLine() ?? "Campo obbligatorio";
+            string citta = Input.String();
             citta = citta.Trim().ToLower();
 
             if (string.IsNullOrEmpty(nome) || string.IsNullOrEmpty(cognome) || string.IsNullOrEmpty(email) || // Controlla se tutti i campi sono stati compilati
@@ -289,7 +290,7 @@ public abstract class Utente
 
         do
         {
-            string scelta = Console.ReadLine() ?? "1";
+            string scelta = Input.String();
             switch (scelta)
             {
                 case "1":
@@ -389,12 +390,12 @@ public abstract class Utente
     {
         Console.WriteLine("Modifica il tuo profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Email\n 4. Password\n 5. Telefono\n 6. Indirizzo\n 7. Città\n 8. Esci");
-        string scelta = Console.ReadLine() ?? "Campo obbligatorio";
+        string scelta = Input.String();
         switch (scelta)
         {
             case "1":
                 Console.WriteLine("Inserisci il nuovo nome");
-                string nome = Console.ReadLine() ?? "Campo obbligatorio";
+                string nome = Input.String();
                 nome = nome.Trim().ToLower();
                 if (!string.IsNullOrEmpty(nome))
                 {
@@ -420,7 +421,7 @@ public abstract class Utente
                 break;
             case "2":
                 Console.WriteLine("Inserisci il nuovo cognome");
-                string cognome = Console.ReadLine() ?? "Campo obbligatorio";
+                string cognome = Input.String();
                 cognome = cognome.Trim().ToLower();
                 if (!string.IsNullOrEmpty(cognome))
                 {
@@ -446,7 +447,7 @@ public abstract class Utente
                 break;
             case "3":
                 Console.WriteLine("Inserisci la nuova email");
-                string email = Console.ReadLine() ?? "Campo obbligatorio";
+                string email = Input.String();
                 email = email.Trim().ToLower();
                 if (!string.IsNullOrEmpty(email))
                 {
@@ -477,7 +478,7 @@ public abstract class Utente
                 break;
             case "4":
                 Console.WriteLine("Inserisci la nuova password");
-                string password = Console.ReadLine() ?? "Campo obbligatorio";
+                string password = Input.String();
                 password = password.Trim();
                 if (!string.IsNullOrEmpty(password))
                 {
@@ -508,7 +509,7 @@ public abstract class Utente
                 break;
             case "5":
                 Console.WriteLine("Inserisci il nuovo telefono");
-                string telefono = Console.ReadLine() ?? "Campo obbligatorio";
+                string telefono = Input.String();
                 telefono = telefono.ToLower();
                 if (!string.IsNullOrEmpty(telefono))
                 {
@@ -539,7 +540,7 @@ public abstract class Utente
                 break;
             case "6":
                 Console.WriteLine("Inserisci il nuovo indirizzo");
-                string indirizzo = Console.ReadLine() ?? "Campo obbligatorio";
+                string indirizzo = Input.String();
                 indirizzo = indirizzo.Trim().ToLower();
                 if (!string.IsNullOrEmpty(indirizzo))
                 {
@@ -566,7 +567,7 @@ public abstract class Utente
                 break;
             case "7":
                 Console.WriteLine("Inserisci la nuova città");
-                string citta = Console.ReadLine() ?? "Campo obbligatorio";
+                string citta = Input.String();
                 citta = citta.Trim().ToLower();
                 if (!string.IsNullOrEmpty(citta))
                 {
@@ -636,7 +637,7 @@ public class Program
                 Console.WriteLine("[1]: Registrati");
                 Console.WriteLine("[2]: Accedi");
                 Console.WriteLine("[0]: Esci");
-                string scelta = Console.ReadLine()?.Trim() ?? "Campo Obligatorio";
+                string scelta = Input.String();
 
                 // Gestione delle scelte dell'utente
                 scelta = scelta.Trim();
@@ -728,7 +729,7 @@ public class Program
             Console.WriteLine("[4] Modifica profilo personale");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
-            string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+            string menuAction = Input.String();
 
             switch (menuAction)
             {
@@ -778,7 +779,7 @@ public class Program
             Console.WriteLine("[9] Modifica profilo personale");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
-            string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+            string menuAction = Input.String();
 
             switch (menuAction)
             {
@@ -854,7 +855,7 @@ public class Program
             Console.WriteLine("[15] Modifica utente");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
-            string menuAction = Console.ReadLine() ?? "Campo obbligatorio";
+            string menuAction = Input.String();
 
             switch (menuAction)
             {

@@ -93,23 +93,15 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
         Console.WriteLine("--------------------------------------------------");
         Console.WriteLine("ELENCO ANIMALI");
         Console.WriteLine("--------------------------------------------------");
+        List<int> idList = new List<int>();
         while (rdr.Read())
         {
+            idList.Add((int)rdr[0]);
             Console.WriteLine($"ID: {rdr[0]}, Nome: {rdr[1]}, Età: {rdr[2]}");
         }
         rdr.Close();
-        
-        int animaleId = 0;
-        bool success = false;
-        while (!success)
-        {
-            Console.Write("Seleziona ID animale: ");
-            success = int.TryParse(Console.ReadLine(), out animaleId);
-            if (!success)
-            {
-                Console.WriteLine("Input non valido");
-            }
-        }
+        Console.Write("Seleziona ID animale: ");
+        int animaleId = Input.SelectId(idList);
 
 
         string query = @"SELECT animale.animale_id, animale.nome, animale.vaccinato, diario_clinico.numero_visite, diario_clinico.ultima_visita, diario_clinico.prossimo_richiamo
