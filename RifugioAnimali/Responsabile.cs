@@ -178,7 +178,7 @@ public class Responsabile : Staff
         Console.Write("Inserisci ID dell'utente da modificare: ");
         int selectedUtenteId = Input.SelectId(idList);
 
-        Console.WriteLine("Modifica il tuo profilo:");
+        Console.WriteLine("Modifica il profilo:");
         Console.WriteLine("Quale campo vuoi modificare?\n 1. Nome\n 2. Cognome\n 3. Telefono\n 4. Indirizzo\n 5. Città\n 6. Esci");
         string scelta = Input.String();
         switch (scelta)
