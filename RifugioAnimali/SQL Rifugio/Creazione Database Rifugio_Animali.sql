@@ -93,7 +93,7 @@ create table adozione
 create table inventario
 (
 	inventario_id int primary key auto_increment,
-    scadenza date not null
+    scadenza date
 );
 
 create table categoria_cibo

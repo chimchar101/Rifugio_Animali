@@ -552,7 +552,7 @@ public class Staff : Utente
             for (int i = 0; i < amount; i++)
             {
                 int inventarioID = AddInventarioID(connection, null);
-                string sql = @"insert into cibo(nome, taglia, categoria_id, inventario_id, specie_id)
+                string sql = @"insert into accessorio(nome, taglia, categoria_id, inventario_id, specie_id)
                     values (@nome, @taglia, @categoria_id, @inventario_id, @specie_id)";
                 MySqlCommand cmd = new MySqlCommand(sql, connection);
                 cmd.Parameters.AddWithValue("@nome", nomeCibo);
