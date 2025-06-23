@@ -41,7 +41,7 @@ Gli account di livello Volontario hanno a disposizione 9 funzioni:
 - **Modifica profilo personale**: permette al volontario di modificare i dati del proprio account.
 
 ### Responsabile
-Gli account di livello Responsabile, oltre alle funzioni dei volontari, hanno a dispozione 6 nuove funzioni:
+Gli account di livello Responsabile, oltre alle funzioni dei volontari, hanno a dispozione 7 nuove funzioni:
 - **Aggiungi specie**: permette al responsabile di aggiungere una nuova specie di animali al rifugio.
 - **Aggiungi staff**: permette la creazione di un utente e la successiva assegnazione al ruolo di volontario o responsabile.
 - **Rimuovi staff**: permette al responsabile di rimuovere un membro dello staff.
