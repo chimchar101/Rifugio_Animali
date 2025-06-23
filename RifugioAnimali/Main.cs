@@ -853,6 +853,7 @@ public class Program
             Console.WriteLine("[13] Visualizza clienti");
             Console.WriteLine("[14] Modifica profilo personale");
             Console.WriteLine("[15] Modifica utente");
+            Console.WriteLine("[16] Visualizza statistiche");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             string menuAction = Input.String();
@@ -917,6 +918,10 @@ public class Program
 
                 case "15":
                     responsabile.ModificaUtente(connection);
+                    break;
+
+                case "16":
+                    Stats.StatsMenu(connection);
                     break;
 
                 case "0":
