@@ -5,10 +5,6 @@ using MySql.Data.MySqlClient;
 public class Cliente : Utente // Classe Cliente che estende la classe Utente
 {
     private int _utenteId;
-    /* public int UtenteId
-    {
-        get { return _utenteId; }
-    } */
 
     private int _clienteId;
     public int ClienteId
@@ -56,6 +52,7 @@ public class Cliente : Utente // Classe Cliente che estende la classe Utente
             }
         }
     }
+
     public void StampaAdozioni(MySqlConnection connection) // Metodo per stampare le adozioni effettuate dal cliente
     {
         string query = @"SELECT * FROM adozione

@@ -4,11 +4,6 @@ using MySql.Data.MySqlClient;
 public class Staff : Utente
 {
     protected int _utenteId;
-    /* public int UtenteId
-    {
-        get { return _utenteId; }
-        
-    } */
 
     protected int _staffId;
     public int StaffId

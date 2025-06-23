@@ -128,6 +128,7 @@ public class Responsabile : Staff
             Console.WriteLine("Errore durante la stampa dello staff: " + ex.Message);
         }
     }
+
     public void StampaClienti(MySqlConnection connection)
     {
         string query = @"select c.cliente_id, u.nome as Nome, u.cognome as Cognome, u.email as Email, u.telefono as Telefono
