@@ -48,6 +48,7 @@ Gli account di livello Responsabile, oltre alle funzioni dei volontari, hanno a 
 - **Visualizza staff**: permette la visualizzazione di tutti i membri dello staff.
 - **Visualizza clienti**: permette la visualizzazione di tutti i clienti del rifugio.
 - **Modifica utente**: permette al responsabile di modificare i dati di un utente a scelta.
+- **Visualizza statistiche**: permette al responsabile di visualizzare varie statistiche sul rifugio e i suoi animali.
 
 ## ⬇️ Come accedere al progetto
 
