@@ -613,7 +613,7 @@ public class Program
     public static void Main(string[] args)
     {
         // Stringa di connessione al database MySQL locale
-        string connStr = "server=localhost; user=root; password=1234; port=3306; database=rifugio_animali;";
+        string connStr = "server=[SERVER];port=[PORT];user=[USER];password=[PASSWORD];database=[DATABASE];";
         using MySqlConnection conn = new MySqlConnection(connStr);
 
         //Utente utente;
